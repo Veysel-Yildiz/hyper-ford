@@ -47,6 +47,7 @@ tf  = 1 / ( 1 + i)**25 # 25 year of discount for electro-mechanic parts
 #
 
 ObjectiveF = 1 # Specify the objective function 1: NPV, 2: BC
+operating_scheme = 1   #  1 = 1 small + identical, 2 = all identical, 3 = all varied
 
 ##################################################
 # Define variables and interpolation function for the calculation of turbines efficiencies
@@ -64,7 +65,7 @@ eff_francis = EffCurves[:,2] #Francis turbine efficiency
 eff_pelton = EffCurves[:,3] #Pelton turbine efficiency
 
 ###############################################################################
-######################################do not change this parameters############
+###################################### do not change this parameters ############
 ##Model setup 
 
 e = 0.45*10**(-4);        # epsilon (m) ; fiberglass e = 5*10^(-6) (m), concrete e = 1.8*10^(-4) (m)

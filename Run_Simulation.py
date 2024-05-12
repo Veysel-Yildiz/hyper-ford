@@ -30,9 +30,13 @@ from sim_operation_type import sim_config
 # Run the model
 typet =  1   # turbine type: 1 = Kaplan, 2 = Francis, 3= Pelton
 conf = 2  # turbine config: 1 = single, 2 = dual, 3 = triple
-D = 5 # as m
-QL = 6 #as m3/s, design discharge of large turbine
-QS = 5# as m3/s, design discharge of small turbine
+D = 2 # as m
+Q1 = 6 #as m3/s, design discharge of large turbine
+Q2 = 5# as m3/s, design discharge of small turbine
 
-P, AAE, OF = sim_config (typet, conf, D, QL, QS);
+X =  np.array([D, Q1, Q2])
+
+P, AAE, OF = sim_config (typet, conf, X);
  # P: Daily power, AAE: Annual average energy, OF: Objective Function
+
+display(AAE)

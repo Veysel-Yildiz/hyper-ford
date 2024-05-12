@@ -28,7 +28,7 @@ def sim_config( typet, conf, D, QL, QS):
 
         
     elif conf == 2: # 2 turbine
-        [P,  AAE, OF] = Sim_calc_2 (typet, conf, D, QL, QS);
+        [P,  AAE, OF] = Sim_calc_2 (typet, conf, X);
  
     
     elif conf == 3: # 3 turbine
