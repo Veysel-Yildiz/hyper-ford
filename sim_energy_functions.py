@@ -363,13 +363,13 @@ def Sim_energy_OP(typet, conf, X):
 
  #design head ------------------------------------------
 
- Re_d = 4 * Od / ( math.pi * D * HP.v ) #Calculate the Reynolds number for design head
+ Re_d = 4 * Q_design / ( math.pi * D * HP.v ) #Calculate the Reynolds number for design head
 
 # Find f, the friction factor [-] for design head
  f_d = moody ( ed , Re_d )
 
 # Claculate flow velocity in the pipe for design head
- V_d = 4 * Od / ( math.pi * D**2 )
+ V_d = 4 * Q_design / ( math.pi * D**2 )
 
 
 ##head losses
@@ -378,7 +378,7 @@ def Sim_energy_OP(typet, conf, X):
 
  design_h = HP.hg - hf_d # design head
  
- design_ic   = design_h * HP.g  * Od # installed capacity
+ design_ic   = design_h * HP.g  * Q_design # installed capacity
 
 ##  Now check the specific speeds of turbines 
 
@@ -404,7 +404,123 @@ def Sim_energy_OP(typet, conf, X):
 ##
 
 
+ Ns = 10 # size of the random sample 
+ 
+ # Calculate minflow using kmin and the minimum of Od1 and Od2
+ minflow = kmin * min(Od1, Od2)
 
+ # Define the number of rows for discretization
+ rowCount = 100
+
+ # Create an array 'q_inc' using linspace with 'rowCount' elements
+ # 'minflow' is the starting value, 'Q_design' is the ending value,
+ # and 'rowCount' is the number of elements to generate
+ q_inc = np.linspace(minflow, Q_design, rowCount)
+
+ # Generate all random values at once
+ nr = np.random.rand(Ns, On, rowCount)
+
+ # Normalize so the sum is 1 along the second dimension (axis=1)
+ # This is equivalent to dividing each row of 'nr' by the sum of the corresponding row
+ nr = nr / np.sum(nr, axis=1, keepdims=True)
+
+
+ # Create arrays filled with zeros
+ q = np.zeros((Ns, rowCount))
+ Eff_q = np.zeros((Ns, rowCount))
+ 
+ 
+ 
+ # Loop through each value of On
+ for i in range(On):
+    # Perform Voperation_OPT operation 
+    qi, Eff_qi, _ = Voperation_OPT(nr[:, i, :], Qturbine[i], q_inc, kmin, perc, func_Eff)
+    
+    # Update q and nP arrays
+    q += qi
+    Eff_q += Eff_qi
+    
+    # Calculate the Reynolds number
+    Re = 4 * q / (np.pi * D * ve)
+ 
+    # Find f, the friction factor [-]
+    f  = moody ( ed , Re )
+
+   # Calculate the head loss due to friction in the penstock
+    hnet = hg - f * (L / D) * (4 * q / (np.pi * D**2))**2 / (19.62 * 1.1)
+
+   # Calculate DP
+    DP = Eff_q * hnet * 9.6138  # DP = 9.81 * ng;
+
+    # Find the index of the maximum value in each column of DP
+    id = np.argmax(DP, axis=0)
+
+    # Create Ptable
+    Ptable = np.column_stack((q_inc, DP[id, np.arange(rowCount)]))
+
+    ## Initialize operating_mode array with NaN values
+    #operating_mode = np.full((rowCount, On), np.nan) # allocated discharge
+    ## Loop through each row
+    #for i in range(rowCount):
+    ## Copy values from nr[id[i], :, i] to operating_mode[i, :]
+     #operating_mode[i, :] = nr[id[i], :, i]
+    
+    
+    # Extract TableFlow and TablePower
+    TableFlow = Ptable[:, 0]
+    TablePower = Ptable[:, 1]
+
+     # Pre-allocate output variable
+    P = np.zeros(maxT)
+
+     # Calculate sum of Od1 and Od2
+    qw = np.minimum(Q, Q_design)
+
+    # Find the indices corresponding to qw < minflow
+    shutDownIndices = np.where(qw < minflow)[0]
+
+    # Find the indices corresponding to qw >= minflow
+    activeIndices = np.where(qw >= minflow)[0]
+
+    # Calculate pairwise distances between qw(activeIndices) and TableFlow
+    distances = np.abs(qw[activeIndices][:, np.newaxis] - TableFlow[np.newaxis, :])
+
+    # Find the indices of TableFlow closest to qw for active turbines
+    indices = np.argmin(distances, axis=1)
+
+    # Assign TablePower values to active turbines based on the indices
+    P[activeIndices] = TablePower[indices]
+
+    AAE = np.mean(P) * HP.hr / 10**6  # Gwh Calculate average annual energy
+    
+  
+    
+    
+ def Voperation_OPT(nr, Od, q_inc, kmin, perc, func_Eff):
+     
+
+    # Multiply each row of nr by the corresponding element of q_inc
+    nrc = nr * q_inc
+
+    # Calculate qt as the minimum of nrc and Od
+    qt = np.minimum(nrc, Od)
+
+    # Interpolate values from func_Eff based on qt/Od ratio
+    Daily_Efficiency = np.interp(qt / Od, perc, func_Eff)
+
+    # Set qt and nrc to zero where qt is less than kmin * Od
+    idx = qt < kmin * Od
+    qt[idx] = 0
+    nrc[idx] = 0
+
+    # Calculate np as the product of Efficiency and qt
+    Eff_qi = Daily_Efficiency * qt
+
+    return qt, Eff_qi, nrc
+ 
+ 
+ 
+ 
 # # ############ Now iterate over time % % % % % % % % % % % % % %
  for t in range(maxT): 
     
