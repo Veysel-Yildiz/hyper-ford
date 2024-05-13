@@ -12,26 +12,22 @@
  ObjectiveF = objective function
  typet = turbine type
  conf = turbine configuration; single, dual, triple
- D = penstock diameter
- QL = large tubine design discharge
- QS = Small tubine design discharge
+ X = array of design parameters;
+ X(1) = D, penstock diameter
+ X(2...) = tubine(s) design discharge
 
 """
 # Import  the all the functions defined
 from sim_energy_functions import *
 
 
-def sim_config( typet, conf, D, QL, QS): 
+def sim_config( typet, conf, X): 
     
     if conf == 1: # 1 turbine
-        [P,  AAE, OF] = Sim_calc_1 ( typet, conf, D, QL, QS);
+        [P,  AAE, OF] = Sim_energy_single ( typet, conf, X);
 
         
-    elif conf == 2: # 2 turbine
-        [P,  AAE, OF] = Sim_calc_2 (typet, conf, X);
- 
-    
-    elif conf == 3: # 3 turbine
-        [P,  AAE, OF] = Sim_calc_3 ( typet, conf, D, QL, QS);   
-    
+    else: # 2 or more turbine
+        [P,  AAE, OF] = Sim_energy_OP (typet, conf, X);
+      
     return P,  AAE, OF

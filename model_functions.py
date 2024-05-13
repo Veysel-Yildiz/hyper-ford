@@ -77,8 +77,10 @@ def moody(ed , Re):
 
  f[LamR] = 64 / Re[LamR]
 
- f[LamT] = 1.325 / (np.log(ed / 3.7 + 5.74 / (Re[LamT] ** 0.9)) ** 2)
-
+ #f[LamT] = 1.325 / (np.log(ed / 3.7 + 5.74 / (Re[LamT] ** 0.9)) ** 2)
+ f[LamT] = np.where(Re[LamT] == 0, 0, 1.325 / (np.log(ed / 3.7 + 5.74 / (Re[LamT] ** 0.9)) ** 2))
+ 
+ 
  Y3 = -0.86859 * np.log(ed / 3.7 + 5.74 / (4000 ** 0.9))
  Y2 = ed / 3.7 + 5.74 / (Re[LamTrans] ** 0.9)
  FA = Y3 ** (-2)
@@ -92,4 +94,26 @@ def moody(ed , Re):
 
  return f
     
+################################################## operation optimization  #########################
 
+def inflow_allocation(nr, Od, q_inc, kmin, perc, func_Eff):
+     
+
+    # Multiply each row of nr by the corresponding element of q_inc
+   nrc = nr * q_inc
+
+    # Calculate qt as the minimum of nrc and Od
+   qt = np.minimum(nrc, Od)
+
+    # Interpolate values from func_Eff based on qt/Od ratio
+   Daily_Efficiency = np.interp(qt / Od, perc, func_Eff)
+
+    # Set qt and nrc to zero where qt is less than kmin * Od
+   idx = qt < kmin * Od
+   qt[idx] = 0
+   nrc[idx] = 0
+
+    # Calculate np as the product of Efficiency and qt
+   Eff_qi = Daily_Efficiency * qt
+
+   return qt, Eff_qi, nrc

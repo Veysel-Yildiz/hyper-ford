@@ -3,7 +3,7 @@
 ############################################################################
 #                     Written by Veysel Yildiz                             #
 #                   The University of Sheffield                            #
-#                           June 2024                                     #
+#                           June 2024                                      #
 ############################################################################
 """
 """ Return daily power production and objective functions for SINGLE, DUAL and TRIPLE operation mode
@@ -276,7 +276,7 @@ def Sim_energy_OP(typet, conf, X):
  # Loop through each value of On
  for i in range(maxturbine):
     # Perform Voperation_OPT operation 
-    qi, Eff_qi, _ = Voperation_OPT(nr[:, i, :], Qturbine[i], q_inc, kmin, perc, func_Eff)
+    qi, Eff_qi, _ = inflow_allocation (nr[:, i, :], Qturbine[i], q_inc, kmin, perc, func_Eff)
     
     # Update q and nP arrays
     q += qi
@@ -335,8 +335,6 @@ def Sim_energy_OP(typet, conf, X):
 
     AAE = np.mean(P) * HP.hr / 10**6  # Gwh Calculate average annual energy
     
-
-
     costP = cost(design_ic, design_h, typet, conf, D);
 
   #Unpack costs
@@ -368,24 +366,3 @@ def Sim_energy_OP(typet, conf, X):
 #
 
 
- def Voperation_OPT(nr, Od, q_inc, kmin, perc, func_Eff):
-     
-
-    # Multiply each row of nr by the corresponding element of q_inc
-    nrc = nr * q_inc
-
-    # Calculate qt as the minimum of nrc and Od
-    qt = np.minimum(nrc, Od)
-
-    # Interpolate values from func_Eff based on qt/Od ratio
-    Daily_Efficiency = np.interp(qt / Od, perc, func_Eff)
-
-    # Set qt and nrc to zero where qt is less than kmin * Od
-    idx = qt < kmin * Od
-    qt[idx] = 0
-    nrc[idx] = 0
-
-    # Calculate np as the product of Efficiency and qt
-    Eff_qi = Daily_Efficiency * qt
-
-    return qt, Eff_qi, nrc
