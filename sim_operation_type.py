@@ -7,13 +7,15 @@
 ############################################################################
 """
 """ Return :
- ----------
+    
           P: Daily power
         AAE: Annual average energy
         OF : Objective Function  
         
+--------------------------------------
+         
     Inputs :
- ----------
+
           P : structure with variables used in calculation
           Q : daily flow
  ObjectiveF : objective function

@@ -21,13 +21,15 @@ import HP
 def cost(design_ic, design_h, typet, conf, D):
 
  """ Return:
-  ----------
+
      cost_em : Electro-mechanic (turbine) cost in million USD
     cost_pen : Penstock cost in million USD
      cost_ph : Powerhouse cost in million USD
  
+--------------------------------------
+    
    Inputs :
-    ----------
+
         HP : structure with variables used in calculation
  design_ic : installed capacity
   design_h : design head
@@ -68,9 +70,11 @@ def cost(design_ic, design_h, typet, conf, D):
 def moody(ed , Re):
 
  """ Return f, friction factor
+
+--------------------------------------
  
   Inputs:
-    ----------
+
     HP : structure with variables used in calculation
     ed : the relative roughness: epsilon / diameter.
     Re : the Reynolds number
@@ -78,18 +82,16 @@ def moody(ed , Re):
  """
  f = np.zeros_like(Re)
 
-  # Find the indices for Laminar, Transitional and Turbulent flow regimes
+ # Find the indices for Laminar, Transitional and Turbulent flow regimes
+ 
  LamR = np.where((0 < Re) & (Re < 2000))
  LamT = np.where(Re > 4000)
  LamTrans = np.where((2000 < Re) & (Re < 4000))
 
  f[LamR] = 64 / Re[LamR]
 
-  # Calculate friction factor for Turbulent flow using the Colebrook-White approximation
- #f[LamT] = 1.325 / (np.log(ed / 3.7 + 5.74 / (4000000 ** 0.9)) ** 2)
+ # Calculate friction factor for Turbulent flow using the Colebrook-White approximation
  f[LamT] = 1.325 / (np.log(ed / 3.7 + 5.74 / (Re[LamT] ** 0.9)) ** 2)
- #log_term = np.log(ed / 3.7 + 5.74 / (Re[LamT] ** 0.9))
- #f[LamT] = np.where(log_term != 0, 1.325 / (log_term ** 2), 0)
   
  Y3 = -0.86859 * np.log(ed / 3.7 + 5.74 / (4000 ** 0.9))
  Y2 = ed / 3.7 + 5.74 / (Re[LamTrans] ** 0.9)
@@ -109,13 +111,15 @@ def moody(ed , Re):
 def inflow_allocation(nr, Od, q_inc, kmin, perc, func_Eff):
      
  """ Return:
-  ----------
+
           qt : Turbine inflow for each incremental step.
       Eff_qi : Efficiency and inflow multiplication for energy calculation.
          nrc : Turbine running capacity as a ratio
-            
+ 
+--------------------------------------
+           
     Inputs:
-    ----------
+
           nr : Turbine random sampled allocated discharge.
           Od : Turbine design discharge.
        q_inc : Incremental flow steps between turbine min and  max (design) discharge.
@@ -125,21 +129,21 @@ def inflow_allocation(nr, Od, q_inc, kmin, perc, func_Eff):
 
  """
 
-    # Multiply each row of nr by the corresponding element of q_inc
+ # Multiply each row of nr by the corresponding element of q_inc
  nrc = nr * q_inc
 
-    # Calculate qt as the minimum of nrc and Od
+ # Calculate qt as the minimum of nrc and Od
  qt = np.minimum(nrc, Od)
 
-    # Interpolate values from func_Eff based on qt/Od ratio
+ # Interpolate values from func_Eff based on qt/Od ratio
  Daily_Efficiency = np.interp(qt / Od, perc, func_Eff)
 
-    # Set qt and nrc to zero where qt is less than kmin * Od
+ # Set qt and nrc to zero where qt is less than kmin * Od
  idx = qt < kmin * Od
  qt[idx] = 0
  nrc[idx] = 0
 
-    # Calculate np as the product of Efficiency and qt
+ # Calculate np as the product of Efficiency and qt
  Eff_qi = Daily_Efficiency * qt
 
  return qt, Eff_qi, nrc
@@ -152,19 +156,24 @@ def generate_patterns(maxturbine):
     
     """ Return pattern, all possible combinations of turbines at full capacity
  
+    --------------------------------------
+    
     Inputs:
-    ----------
+
     maxturbine : Number of turbine
 
     """
     
-    patterns = []
+    patterns = [] # Initialize an empty list to store patterns
     
     # Generate all possible patterns of 1s and 0s for the given maxturbine, 
-    for num_ones in range(1, maxturbine + 1):
+    for num_ones in range(1, maxturbine + 1): 
+        
+        # Iterate over combinations of indices for placing 1s
         for comb in combinations(range(maxturbine), num_ones):
-            pattern = [0] * maxturbine
-            for index in comb:
+            
+            pattern = [0] * maxturbine # Initialize pattern with all 0s
+            for index in comb: # Set indices corresponding to 1s
                 pattern[index] = 1
-            patterns.append(pattern)
+            patterns.append(pattern) # Add the pattern to the list
     return patterns

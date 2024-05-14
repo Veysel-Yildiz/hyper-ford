@@ -7,13 +7,15 @@
 ############################################################################
 """
 """ Return :
- ----------
+
           P: Daily power
         AAE: Annual average energy
         OF : Objective Function  
+
+--------------------------------------
         
     Inputs :
- ----------
+
          HP : structure of global variables
           Q : daily flow
  ObjectiveF : objective function
@@ -254,13 +256,13 @@ def Sim_energy_OP(typet, conf, X):
  ##
 
 
- Ns = 10 # size of the random sample 
+ Ns = 1000 # size of the random sample 
  
  # Calculate minflow using kmin and the minimum of Od1 and Od2
  minflow = kmin * min(Od1, Od2)
 
  # Define the number of rows for discretization
- rowCount = 2
+ rowCount = 1000
 
  # Create an array 'q_inc' using linspace with 'rowCount' elements
  # 'minflow' is the starting value, 'Q_design' is the ending value,
