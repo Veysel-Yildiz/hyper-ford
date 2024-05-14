@@ -6,15 +6,22 @@
 #                           June 2024                                      #
 ############################################################################
 """
-""" Return daily power production and objective functions for SINGLE, DUAL and TRIPLE operation mode
- HP = structure with variables used in calculation
- Q = daily flow
- ObjectiveF = objective function
- typet = turbine type
- conf = turbine configuration; single, dual, triple
- D = penstock diameter
- QL = large tubine design discharge
- QS = Small tubine design discharge
+""" Return :
+ ----------
+          P: Daily power
+        AAE: Annual average energy
+        OF : Objective Function  
+        
+    Inputs :
+ ----------
+         HP : structure of global variables
+          Q : daily flow
+ ObjectiveF : objective function
+      typet : turbine type
+       conf : turbine configuration; single, dual, triple
+          X : array of design parameters;
+       X(1) : D, penstock diameter
+    X(2...) : tubine(s) design discharge
 
 """
 
@@ -48,23 +55,23 @@ def Sim_energy_single(typet, conf, X):
  
  #Unpack the parameter values
  D = X[0] # diameter
- Od = X[1] # discharge
+ Od = X[1] # design discharge
   
   # choose turbine characteristics
  if typet == 2: # Francis turbine
-    kmin = HP.mf
+    kmin = HP.mf # min flow
     var_name_cavitation = HP.nf #specific speed range
-    func_Eff = HP.eff_francis
+    func_Eff = HP.eff_francis # efficiency curve
     
  elif typet == 3: #Pelton turbine
-    kmin = HP.mp
+    kmin = HP.mp # min flow
     var_name_cavitation = HP.np #specific speed range
-    func_Eff = HP.eff_pelton
+    func_Eff = HP.eff_pelton# efficiency curve
     
  else:
-    kmin = HP.mk
+    kmin = HP.mk # min flow
     var_name_cavitation = HP.nk #specific speed range
-    func_Eff = HP.eff_kaplan
+    func_Eff = HP.eff_kaplan# efficiency curve
     
  ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
 
@@ -253,7 +260,7 @@ def Sim_energy_OP(typet, conf, X):
  minflow = kmin * min(Od1, Od2)
 
  # Define the number of rows for discretization
- rowCount = 100
+ rowCount = 2
 
  # Create an array 'q_inc' using linspace with 'rowCount' elements
  # 'minflow' is the starting value, 'Q_design' is the ending value,
@@ -262,18 +269,21 @@ def Sim_energy_OP(typet, conf, X):
 
  # Generate all random values at once
  nr = np.random.rand(Ns, maxturbine, rowCount)
+ 
+ # Generate patterns for the current maxturbine value
+ # This is to make sure that turbines will be sampled at full capacity
+ patterns = generate_patterns(maxturbine)
 
+# Apply the generated patterns to the nr array
+ for i, pattern in enumerate(patterns):
+    if i >= Ns:  # Avoid going out of bounds
+        break
+    nr[i, :, :] = np.array(pattern)[:, np.newaxis]
+    
  # Normalize so the sum is 1 along the second dimension (axis=1)
  # This is equivalent to dividing each row of 'nr' by the sum of the corresponding row
  nr = nr / np.sum(nr, axis=1, keepdims=True)
  
- # Initialize the first `maxturbine` rows
- # This is to make sure that turbines will be sampled at full capacity
- for i in range(maxturbine):
-    nr[i, :, :] = 0  # Set all values to 0 initially
-    nr[i, i, :] = 1  # Set the ith position to 1 for all columns
-    
-
  # Create arrays filled with zeros
  q = np.zeros((Ns, rowCount))
  Eff_q = np.zeros((Ns, rowCount))

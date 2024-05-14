@@ -12,6 +12,7 @@ import scipy.optimize
 import numpy as np
 import math 
 import statistics
+from itertools import combinations
 
 # Import global parameters including site characteristics and streamflow records
 import HP
@@ -142,3 +143,28 @@ def inflow_allocation(nr, Od, q_inc, kmin, perc, func_Eff):
  Eff_qi = Daily_Efficiency * qt
 
  return qt, Eff_qi, nrc
+
+
+################################################## possible combinations #########################
+
+def generate_patterns(maxturbine):
+    # Function to generate the required combinations
+    
+    """ Return pattern, all possible combinations of turbines at full capacity
+ 
+    Inputs:
+    ----------
+    maxturbine : Number of turbine
+
+    """
+    
+    patterns = []
+    
+    # Generate all possible patterns of 1s and 0s for the given maxturbine, 
+    for num_ones in range(1, maxturbine + 1):
+        for comb in combinations(range(maxturbine), num_ones):
+            pattern = [0] * maxturbine
+            for index in comb:
+                pattern[index] = 1
+            patterns.append(pattern)
+    return patterns
