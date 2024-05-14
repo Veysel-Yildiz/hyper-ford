@@ -208,14 +208,14 @@ def Sim_energy_OP(typet, conf, X):
 
  Re_d = 4 * Q_design / ( math.pi * D * HP.v ) #Calculate the Reynolds number for design head
 
-# Find f, the friction factor [-] for design head
+ # Find f, the friction factor [-] for design head
  f_d = moody ( ed , np.array([Re_d]) )
 
-# Claculate flow velocity in the pipe for design head
+ # Claculate flow velocity in the pipe for design head
  V_d = 4 * Q_design / ( math.pi * D**2 )
 
 
-##head losses
+ # head losses
  hf_d = f_d*(HP.L/D)*V_d**2/(2*HP.g)*1.1 # 10% of local losses
  #hl_d = HP.K_sum*V_d^2/(2*HP.g);
 
@@ -223,7 +223,7 @@ def Sim_energy_OP(typet, conf, X):
  
  design_ic   = design_h * HP.g  * Q_design # installed capacity
 
-##  Now check the specific speeds of turbines 
+ # Now check the specific speeds of turbines 
 
  ss_L1 = 3000/60 * math.sqrt(Od1)/(HP.g*design_h )**0.75
  ss_S1 = 214/60 * math.sqrt(Od1)/(HP.g*design_h  )**0.75
@@ -244,7 +244,7 @@ def Sim_energy_OP(typet, conf, X):
     SS = 1
  else: 
     SS = 0
-##
+ ##
 
 
  Ns = 10 # size of the random sample 
@@ -266,7 +266,13 @@ def Sim_energy_OP(typet, conf, X):
  # Normalize so the sum is 1 along the second dimension (axis=1)
  # This is equivalent to dividing each row of 'nr' by the sum of the corresponding row
  nr = nr / np.sum(nr, axis=1, keepdims=True)
-
+ 
+ # Initialize the first `maxturbine` rows
+ # This is to make sure that turbines will be sampled at full capacity
+ for i in range(maxturbine):
+    nr[i, :, :] = 0  # Set all values to 0 initially
+    nr[i, i, :] = 1  # Set the ith position to 1 for all columns
+    
 
  # Create arrays filled with zeros
  q = np.zeros((Ns, rowCount))
@@ -281,7 +287,7 @@ def Sim_energy_OP(typet, conf, X):
     # Update q and nP arrays
     q += qi
     Eff_q += Eff_qi
-    
+
     # Calculate the Reynolds number
     Re = 4 * q / (np.pi * D * ve)
     
@@ -338,9 +344,9 @@ def Sim_energy_OP(typet, conf, X):
     costP = cost(design_ic, design_h, typet, conf, D);
 
   #Unpack costs
-    cost_em = costP[0]
+    cost_em  = costP[0]
     cost_pen = costP[1] 
-    cost_ph = costP[2] #tp = costP(3);
+    cost_ph  = costP[2] #tp = costP(3);
 
     cost_cw = HP.cf * (cost_pen + cost_em ) #(in dollars) civil + open channel + Tunnel cost
 
