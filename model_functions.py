@@ -66,7 +66,7 @@ def cost(design_ic, design_h, typet, conf, D):
 
  return cost_em , np.array([cost_pen]),  cost_ph #tp,
 
-##################################################MOODY########################
+################################################## MOODY ########################
 def moody(ed , Re):
 
  """ Return f, friction factor
@@ -177,3 +177,121 @@ def generate_patterns(maxturbine):
                 pattern[index] = 1
             patterns.append(pattern) # Add the pattern to the list
     return patterns
+
+################################################## daily power #############################
+
+def operation_optimization(maxturbine, Qturbine, Q_design, D,  kmin,  func_Eff):
+  
+  ## unpack global variables
+
+  perc = HP.perc
+  L = HP.L
+  ve = HP.v
+  hg = HP.hg
+  Q  = HP.Q
+  maxT = len(Q)    # the size of time steps
+  
+  Ns = 1000 # size of the random sample 
+ 
+  # Define the number of rows for discretization
+  rowCount = 1000
+  
+  # Find the minimum value in the array and multiply kmin 
+  minflow = kmin*np.min(Qturbine)
+
+  # Create an array 'q_inc' using linspace with 'rowCount' elements
+  # 'minflow' is the starting value, 'Q_design' is the ending value,
+  # and 'rowCount' is the number of elements to generate
+  q_inc = np.linspace(minflow, Q_design, rowCount)
+
+  # Generate all random values at once
+  nr = np.random.rand(Ns, maxturbine, rowCount)
+ 
+  # Generate patterns for the current maxturbine value
+  # This is to make sure that turbines will be sampled at full capacity
+  patterns = generate_patterns(maxturbine)
+
+ # Apply the generated patterns to the nr array
+  for i, pattern in enumerate(patterns):
+     if i >= Ns:  # Avoid going out of bounds
+         break
+     nr[i, :, :] = np.array(pattern)[:, np.newaxis]
+    
+  # Normalize so the sum is 1 along the second dimension (axis=1)
+  # This is equivalent to dividing each row of 'nr' by the sum of the corresponding row
+  nr = nr / np.sum(nr, axis=1, keepdims=True)
+ 
+  # Create arrays filled with zeros
+  q = np.zeros((Ns, rowCount))
+  Eff_q = np.zeros((Ns, rowCount))
+ 
+ 
+  # Loop through each value of On
+  for i in range(maxturbine):
+     # Perform Voperation_OPT operation 
+     qi, Eff_qi, _ = inflow_allocation (nr[:, i, :], Qturbine[i], q_inc, kmin, perc, func_Eff)
+     
+     # Update q and nP arrays
+     q += qi
+     Eff_q += Eff_qi
+
+     # Calculate the Reynolds number
+     Re = 4 * q / (np.pi * D * ve)
+     
+     ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
+     
+     # Find f, the friction factor [-]
+     f  = moody ( ed , Re )
+
+    # Calculate the head loss due to friction in the penstock
+     hnet = hg - f * (L / D) * (4 * q / (np.pi * D**2))**2 / (19.62 * 1.1)
+
+    # Calculate DP
+     DP = Eff_q * hnet * 9.6138  # DP = 9.81 * ng;
+
+     # Find the index of the maximum value in each column of DP
+     id = np.argmax(DP, axis=0)
+
+     # Create Ptable
+     Ptable = np.column_stack((q_inc, DP[id, np.arange(rowCount)]))
+
+    ## Initialize operating_mode array with NaN values
+    #operating_mode = np.full((rowCount, On), np.nan) # allocated discharge
+    ## Loop through each row
+    #for i in range(rowCount):
+    ## Copy values from nr[id[i], :, i] to operating_mode[i, :]
+     #operating_mode[i, :] = nr[id[i], :, i]
+    
+    
+     # Extract TableFlow and TablePower
+     TableFlow = Ptable[:, 0]
+     TablePower = Ptable[:, 1]
+
+     # Pre-allocate output variable
+     dailyPower = np.zeros(maxT)
+
+     # Calculate sum of Od1 and Od2
+     qw = np.minimum(Q, Q_design)
+
+     # Find the indices corresponding to qw < minflow
+     #shutDownIndices = np.where(qw < minflow)[0]
+
+     # Find the indices corresponding to qw >= minflow
+     activeIndices = np.where(qw >= minflow)[0]
+
+     # Calculate pairwise distances between qw(activeIndices) and TableFlow
+     distances = np.abs(qw[activeIndices][:, np.newaxis] - TableFlow[np.newaxis, :])
+
+     # Find the indices of TableFlow closest to qw for active turbines
+     indices = np.argmin(distances, axis=1)
+
+     # Assign TablePower values to active turbines based on the indices
+     dailyPower[activeIndices] = TablePower[indices]
+     
+  return dailyPower
+
+
+################################################## possible combinations #########################
+
+
+

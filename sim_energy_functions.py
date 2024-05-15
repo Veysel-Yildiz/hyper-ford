@@ -6,11 +6,11 @@
 #                           June 2024                                      #
 ############################################################################
 """
-""" Return :
+"""  Return :
 
-          P: Daily power
-        AAE: Annual average energy
-        OF : Objective Function  
+  DailyPower: Daily energy generation
+         AAE: Annual average energy
+         OF : Objective Function  
 
 --------------------------------------
         
@@ -52,13 +52,13 @@ P = np.empty((maxT)) #  create a new array for daily power
 P[:] = np.NaN
  
 ## SINGLE turbine operation ###################################################
-##################################################################SINGLE#######
+
 def Sim_energy_single(typet, conf, X):
  
  #Unpack the parameter values
  D = X[0] # diameter
- Od = X[1] # design discharge
-  
+ Q_design = X[1] # design discharge
+ 
   # choose turbine characteristics
  if typet == 2: # Francis turbine
     kmin = HP.mf # min flow
@@ -97,22 +97,22 @@ def Sim_energy_single(typet, conf, X):
 
 ##  Now check the specific speeds of turbines 
 
- ss_L1 = 3000/60 * math.sqrt(Od)/(HP.g*design_h )**0.75
- ss_S1 = 214/60 * math.sqrt(Od)/(HP.g*design_h  )**0.75
+ ss_L1 = 3000/60 * math.sqrt(Q_design)/(HP.g*design_h )**0.75
+ ss_S1 = 214/60 * math.sqrt(Q_design)/(HP.g*design_h  )**0.75
  
  if var_name_cavitation[1]  <= ss_S1  or ss_L1 <= var_name_cavitation[0]:
     
     SS = 0
     
  # Calculate q as the minimum of Q and Od
- q = np.minimum(Q, Od)
+ q = np.minimum(Q, Q_design)
  
  # Interpolate values from func_Eff based on qt/Od ratio
- n = np.interp(q / Od, perc, func_Eff)
+ n = np.interp(q / Q_design, perc, func_Eff)
  
  
  # Set qt and nrc to zero where qt is less than kmin * Od
- idx = q < kmin * Od
+ idx = q < kmin * Q_design
  n[idx] = 0
 
  # Calculate the Reynolds number
@@ -147,7 +147,6 @@ def Sim_energy_single(typet, conf, X):
 
  cost_OP = cost_em * HP.om #operation and maintenance cost
 
- AAE = statistics.mean(P) * HP.hr/10**6 #Gwh Calculate average annual energy
 
  AR = AAE * HP.ep*0.98 # AnualRevenue in M dollars 2% will not be sold
 
@@ -162,7 +161,7 @@ def Sim_energy_single(typet, conf, X):
 
 ##
   
-## Dual and Triple turbine operation ##########################################
+## Dual and Triple turbine operation; operation optimization ########################
 
 ##################################################################DUAL#######
 def Sim_energy_OP(typet, conf, X):
@@ -255,131 +254,36 @@ def Sim_energy_OP(typet, conf, X):
     SS = 0
  ##
 
-
- Ns = 1000 # size of the random sample 
  
- # Calculate minflow using kmin and the minimum of Od1 and Od2
- minflow = kmin * min(Od1, Od2)
-
- # Define the number of rows for discretization
- rowCount = 1000
-
- # Create an array 'q_inc' using linspace with 'rowCount' elements
- # 'minflow' is the starting value, 'Q_design' is the ending value,
- # and 'rowCount' is the number of elements to generate
- q_inc = np.linspace(minflow, Q_design, rowCount)
-
- # Generate all random values at once
- nr = np.random.rand(Ns, maxturbine, rowCount)
+ DailyPower = operation_optimization(maxturbine, Qturbine, Q_design, D,  kmin,  func_Eff)
  
- # Generate patterns for the current maxturbine value
- # This is to make sure that turbines will be sampled at full capacity
- patterns = generate_patterns(maxturbine)
-
-# Apply the generated patterns to the nr array
- for i, pattern in enumerate(patterns):
-    if i >= Ns:  # Avoid going out of bounds
-        break
-    nr[i, :, :] = np.array(pattern)[:, np.newaxis]
+ AAE = np.mean(DailyPower) * HP.hr / 10**6  # Gwh Calculate average annual energy
     
- # Normalize so the sum is 1 along the second dimension (axis=1)
- # This is equivalent to dividing each row of 'nr' by the sum of the corresponding row
- nr = nr / np.sum(nr, axis=1, keepdims=True)
- 
- # Create arrays filled with zeros
- q = np.zeros((Ns, rowCount))
- Eff_q = np.zeros((Ns, rowCount))
- 
- 
- # Loop through each value of On
- for i in range(maxturbine):
-    # Perform Voperation_OPT operation 
-    qi, Eff_qi, _ = inflow_allocation (nr[:, i, :], Qturbine[i], q_inc, kmin, perc, func_Eff)
-    
-    # Update q and nP arrays
-    q += qi
-    Eff_q += Eff_qi
-
-    # Calculate the Reynolds number
-    Re = 4 * q / (np.pi * D * ve)
-    
-    # Find f, the friction factor [-]
-    f  = moody ( ed , Re )
-
-   # Calculate the head loss due to friction in the penstock
-    hnet = hg - f * (L / D) * (4 * q / (np.pi * D**2))**2 / (19.62 * 1.1)
-
-   # Calculate DP
-    DP = Eff_q * hnet * 9.6138  # DP = 9.81 * ng;
-
-    # Find the index of the maximum value in each column of DP
-    id = np.argmax(DP, axis=0)
-
-    # Create Ptable
-    Ptable = np.column_stack((q_inc, DP[id, np.arange(rowCount)]))
-
-    ## Initialize operating_mode array with NaN values
-    #operating_mode = np.full((rowCount, On), np.nan) # allocated discharge
-    ## Loop through each row
-    #for i in range(rowCount):
-    ## Copy values from nr[id[i], :, i] to operating_mode[i, :]
-     #operating_mode[i, :] = nr[id[i], :, i]
-    
-    
-    # Extract TableFlow and TablePower
-    TableFlow = Ptable[:, 0]
-    TablePower = Ptable[:, 1]
-
-     # Pre-allocate output variable
-    P = np.zeros(maxT)
-
-     # Calculate sum of Od1 and Od2
-    qw = np.minimum(Q, Q_design)
-
-    # Find the indices corresponding to qw < minflow
-    #shutDownIndices = np.where(qw < minflow)[0]
-
-    # Find the indices corresponding to qw >= minflow
-    activeIndices = np.where(qw >= minflow)[0]
-
-    # Calculate pairwise distances between qw(activeIndices) and TableFlow
-    distances = np.abs(qw[activeIndices][:, np.newaxis] - TableFlow[np.newaxis, :])
-
-    # Find the indices of TableFlow closest to qw for active turbines
-    indices = np.argmin(distances, axis=1)
-
-    # Assign TablePower values to active turbines based on the indices
-    P[activeIndices] = TablePower[indices]
-
-    AAE = np.mean(P) * HP.hr / 10**6  # Gwh Calculate average annual energy
-    
-    costP = cost(design_ic, design_h, typet, conf, D);
+ costP = cost(design_ic, design_h, typet, conf, D);
 
   #Unpack costs
-    cost_em  = costP[0]
-    cost_pen = costP[1] 
-    cost_ph  = costP[2] #tp = costP(3);
+ cost_em  = costP[0]
+ cost_pen = costP[1] 
+ cost_ph  = costP[2] #tp = costP(3);
 
-    cost_cw = HP.cf * (cost_pen + cost_em ) #(in dollars) civil + open channel + Tunnel cost
+ cost_cw = HP.cf * (cost_pen + cost_em ) #(in dollars) civil + open channel + Tunnel cost
 
-    Cost_other = cost_pen + cost_ph + cost_cw #Determine total cost (with cavitation)
+ Cost_other = cost_pen + cost_ph + cost_cw #Determine total cost (with cavitation)
 
-    T_cost = cost_em * (1+ HP.tf) + Cost_other + HP.fxc;
+ T_cost = cost_em * (1+ HP.tf) + Cost_other + HP.fxc;
 
-    cost_OP = cost_em * HP.om #operation and maintenance cost
+ cost_OP = cost_em * HP.om #operation and maintenance cost
 
-    AAE = statistics.mean(P) * HP.hr/10**6 #Gwh Calculate average annual energy
+ AR = AAE * HP.ep*0.98 # AnualRevenue in M dollars 2% will not be sold
 
-    AR = AAE * HP.ep*0.98 # AnualRevenue in M dollars 2% will not be sold
+ AC = HP.CRF * T_cost + cost_OP; # Anual cost in M dollars
 
-    AC = HP.CRF * T_cost + cost_OP; # Anual cost in M dollars
-
-    if ObjectiveF == 1:
+ if ObjectiveF == 1:
         OF = (AR - AC ) / HP.CRF
-    elif ObjectiveF == 2:
+ elif ObjectiveF == 2:
       OF = AR / AC
      
- return P, AAE, OF
+ return DailyPower, AAE, OF
 
 #
 

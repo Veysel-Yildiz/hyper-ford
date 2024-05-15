@@ -4,18 +4,24 @@
 ############################################################################
 #                     Written by Veysel Yildiz                             #
 #                   The University of Sheffield                            #
-#                           March 2023                                     #
+#                           June 2024                                      #
 ############################################################################
 """
-""" Return P: Daily power, AAE: Annual average energy, OF: Objective Function 
- HP = structure with variables used in calculation
- Q = daily flow
- ObjectiveF = objective function
- typet = turbine type
- conf = turbine configuration; single, dual, triple
- D = penstock diameter
- QL = large tubine design discharge
- QS = Small tubine design discharge
+""" Return :
+    
+        OF : Objective Function  
+--------------------------------------
+         
+    Inputs :
+
+          P : structure with variables used in calculation
+          Q : daily flow
+ ObjectiveF : objective function
+      typet : turbine type
+       conf : turbine configuration; single, dual, triple
+          X : array of design parameters;
+       X(1) : D, penstock diameter
+    X(2...) : tubine(s) design discharge
 
 """
 # Import  the all the functions defined
@@ -24,15 +30,17 @@ from opt_energy_functions import *
 
 def opt_config(x): 
     
- if round(x[1]) == 1: #conf == 1: 1 turbine
-  return  Opt_calc_1 ( round(x[0]), round(x[1]), x[2], x[3], x[4])  
-
- 
- if round(x[1]) == 2: #conf == 2: 2 turbine
-  return  Opt_calc_2 ( round(x[0]), round(x[1]), x[2], x[3], x[4])
-
-   
- if round(x[1]) == 3: #conf == 3: 3 turbine
-  return  Opt_calc_3 ( round(x[0]), round(x[1]), x[2], x[3], x[4])
+ typet = round(x[0])
+ conf = round(x[1])
+ X =  np.array([x[2], x[3], x[4]]) # np.array([D, Q1, Q2])
 
     
+ if conf == 1: # 1 turbine
+  return  Opt_energy_single (typet, conf, X)
+
+ 
+ else: #conf == 2: more than 1 turbine
+  return  Opt_energy_OP (typet, conf, X)
+
+   
+ 

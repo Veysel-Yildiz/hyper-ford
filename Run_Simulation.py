@@ -29,7 +29,7 @@ from sim_operation_type import sim_config
 
 # Run the model
 typet =  2   # turbine type: 1 = Kaplan, 2 = Francis, 3= Pelton
-conf = 2  # turbine config: 1 = single, 2 = dual, 3 = triple
+conf = 1  # turbine config: 1 = single, 2 = dual, 3 = triple
 D = 2 # as m
 Q1 = 5 #as m3/s, design discharge of first turbine
 Q2 = 10# as m3/s, design discharge of second turbine
