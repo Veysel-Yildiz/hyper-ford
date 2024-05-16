@@ -1,18 +1,14 @@
-
-
 ## HYPER OPTIMIZATION 
 """
 ############################################################################
 #                     Written by Veysel Yildiz                             #
-#                   The University of Sheffield                            #
-#                           June 2024                                      #
+#                      vyildiz1@sheffield.ac.uk                            #
+#                   The University of Sheffield,June 2024                  #
 ############################################################################
 """
 """  Return :
-
          OF : Objective Function  
 --------------------------------------
-        
     Inputs :
 
          HP : structure of global variables
@@ -27,17 +23,16 @@
 """
 
 # Import  the modules to be used from Library
-import scipy.optimize
 import numpy as np
 import math 
-import statistics
+
 #import multiprocessing
 
 # Import global parameters including site characteristics and streamflow records
 import HP
 
 # Import  the all the functions defined
-from model_functions import *
+from model_functions import moody, cost, operation_optimization
 
 ## unpack global variables
 ObjectiveF = HP.ObjectiveF
@@ -162,7 +157,7 @@ def Opt_energy_OP(typet, conf, X):
  for i in range(1, maxturbine + 1):
     if operating_scheme == 1:
         Od = (i == 1) * X[1] + (i > 1) * X[2]
-    elif opscheme == 2:
+    elif operating_scheme == 2:
         Od = X[1]
     else:
         Od = X[i]
@@ -213,7 +208,6 @@ def Opt_energy_OP(typet, conf, X):
 
  if sum(SSn) < 2:  # turbine type is not appropriate
      return penalty * V_d 
-
 
  DailyPower = operation_optimization(maxturbine, Qturbine, Q_design, D, kmin, func_Eff)
  

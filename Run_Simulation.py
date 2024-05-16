@@ -3,22 +3,17 @@
 ############################################################################
 #                     Written by Veysel Yildiz                             #
 #                      vyildiz1@sheffield.ac.uk                            #
-#                   The University of Sheffield                            #
-#                           June 2024                                      #
+#                   The University of Sheffield,June 2024                  #
 ############################################################################
 """
 """ Main File to Run for simulation
 
 Parameters:
 x(1), typet:  Turbine type (1= Kaplan, 2= Francis, 3 = Pelton turbine)
-
 x(2), conf: Turbine configuration (1= Single, 2= Dual, 3 = Triple, ..nth Operation)
- 
 x(3), D: Penstock diameter,
-
 x(4) Od1: First turbine design docharge,
 x(5) Od2: Second turbine design docharge,
-...
 x(n) Odn: nth turbine design docharge,
 
 Return :

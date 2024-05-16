@@ -1,11 +1,9 @@
-
 ## HYPER OPTIMISATION 
 """
 ############################################################################
 #                     Written by Veysel Yildiz                             #
 #                      vyildiz1@sheffield.ac.uk                            #
-#                   The University of Sheffield                            #
-#                           June 2024                                      #
+#                   The University of Sheffield,June 2024                  #
 ############################################################################
 """
 """ 
@@ -13,17 +11,11 @@ Main File to Run for Optimization
 
 Parameters for Differential Evolution (DE):
 x(1), typet:  Turbine type (1= Kaplan, 2= Francis, 3 = Pelton turbine)
-
 x(2), conf: Turbine configuration (1= Single, 2= Dual, 3 = Triple, ..nth Operation)
- 
 x(3), D: Penstock diameter,
-
 x(4) Od1: First turbine design docharge,
-
 x(5) Od2: Second turbine design docharge,
-
 x(6) Od3: Third turbine design docharge,
-...
 x(n) Odn: nth turbine design docharge,
 
 """
@@ -31,9 +23,11 @@ x(n) Odn: nth turbine design docharge,
 # Import  the modules to be used from Library
 from scipy.optimize import  differential_evolution
 import numpy as np
+import pandas as pd
 
 # Import  the all the functions defined
 from opt_energy_functions import Opt_energy_single, Opt_energy_OP
+from PostProcessor import postplot
 
 
 def generate_bounds(numturbine):
@@ -73,15 +67,14 @@ bounds = generate_bounds(numturbine)
 result = differential_evolution(
     opt_config, 
     bounds, 
-    maxiter=100, 
-    popsize=10, 
+    maxiter=200, 
+    popsize=20, 
     tol=0.001, 
     mutation=(0.5, 1), 
     recombination=0.7, 
     init='latinhypercube'
 )
 
-print(result)
 
-#result = differential_evolution(opt_config, bounds, updating='deferred', workers=-1)
-#result = differential_evolution(opt_config, bounds)
+## post processor, a table displaying the optimization results
+optimization_table = postplot(result)

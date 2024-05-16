@@ -2,16 +2,14 @@
 """
 ############################################################################
 #                     Written by Veysel Yildiz                             #
-#                   The University of Sheffield                            #
-#                           June 2024                                      #
+#                      vyildiz1@sheffield.ac.uk                            #
+#                   The University of Sheffield,June 2024                  #
 ############################################################################
 """
 
 # Import  the modules to be used from Library
-import scipy.optimize
 import numpy as np
 import math 
-import statistics
 from itertools import combinations
 
 # Import global parameters including site characteristics and streamflow records
@@ -21,15 +19,12 @@ import HP
 def cost(design_ic, design_h, typet, conf, D):
 
  """ Return:
-
      cost_em : Electro-mechanic (turbine) cost in million USD
     cost_pen : Penstock cost in million USD
      cost_ph : Powerhouse cost in million USD
- 
 --------------------------------------
-    
    Inputs :
-
+       
         HP : structure with variables used in calculation
  design_ic : installed capacity
   design_h : design head
@@ -70,9 +65,7 @@ def cost(design_ic, design_h, typet, conf, D):
 def moody(ed , Re):
 
  """ Return f, friction factor
-
 --------------------------------------
- 
   Inputs:
 
     HP : structure with variables used in calculation
@@ -111,13 +104,11 @@ def moody(ed , Re):
 def inflow_allocation(nr, Od, q_inc, kmin, perc, func_Eff):
      
  """ Return:
-
+     
           qt : Turbine inflow for each incremental step.
       Eff_qi : Efficiency and inflow multiplication for energy calculation.
          nrc : Turbine running capacity as a ratio
- 
---------------------------------------
-           
+--------------------------------------      
     Inputs:
 
           nr : Turbine random sampled allocated discharge.
@@ -155,11 +146,9 @@ def generate_patterns(maxturbine):
     # Function to generate the required combinations
     
     """ Return pattern, all possible combinations of turbines at full capacity
- 
     --------------------------------------
-    
     Inputs:
-
+        
     maxturbine : Number of turbine
 
     """
@@ -181,7 +170,18 @@ def generate_patterns(maxturbine):
 ################################################## daily power #############################
 
 def operation_optimization(maxturbine, Qturbine, Q_design, D,  kmin,  func_Eff):
-  
+   
+  """ Return dailyPower, daily generated power output based on operation optimization
+--------------------------------------
+  Inputs:
+
+  maxturbine : Number of turbines
+    Qturbine : Turbine's design discharge
+           D : Penstock diameter
+        kmin : Technical min flow rate of turbine to operate
+    func_Eff : Efficiency curve
+
+ """ 
   ## unpack global variables
 
   perc = HP.perc

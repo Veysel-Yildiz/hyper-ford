@@ -9,7 +9,6 @@ Contents:
 
 `Run_Simulation.py`: This is the main file to run to simulate enrgy production based on predifined design parameters.
 
-`sim_operation_type.py`: This file specify the operation mode to simulate
 
 `sim_energy_functions.py`: This file contains mainly three functions that return daily power production and objective functions for SINGLE, DUAL and TRIPLE operation mode for simulation.
 
@@ -17,12 +16,11 @@ Contents:
 
 `Run_Optimisation.py`: This is the main file to run to optimise a design of a project. 
 
-`opt_operation_type.py`: This file specify the operation mode to simulate
 
 `opt_energy_functions.py`: This file contains mainly three functions that return daily power production and objective functions for SINGLE, DUAL and TRIPLE operation mode for simulation.
 
 `model_functions.py`: This file contains two functions; (i) return the cost of a project in USD, (ii) returns the friction factor to calculate hydraulic losses. 
 
-`PostProcessor_FDC.py`: This function plots ... figures. 
+
 
 

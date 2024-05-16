@@ -2,18 +2,15 @@
 """
 ############################################################################
 #                     Written by Veysel Yildiz                             #
-#                   The University of Sheffield                            #
-#                           June 2024                                      #
+#                      vyildiz1@sheffield.ac.uk                            #
+#                   The University of Sheffield,June 2024                  #
 ############################################################################
 """
 """  Return :
-
          AAE: Annual average energy
         NPV : Net Present Value in million USD
         BC  : Benefot to Cost Ratio
-
 --------------------------------------
-        
     Inputs :
 
          HP : structure of global variables
@@ -30,13 +27,12 @@
 # Import  the modules to be used from Library
 import numpy as np
 import math 
-import statistics
 
 # Import global parameters including site characteristics and streamflow records
 import HP
 
 # Import  the all the functions defined
-from model_functions import *
+from model_functions import moody, cost, operation_optimization
 
 ## unpack global variables
 ObjectiveF = HP.ObjectiveF
@@ -166,7 +162,7 @@ def Sim_energy_OP(typet, conf, X):
  for i in range(1, maxturbine + 1):
     if operating_scheme == 1:
         Od = (i == 1) * X[1] + (i > 1) * X[2]
-    elif opscheme == 2:
+    elif operating_scheme == 2:
         Od = X[1]
     else:
         Od = X[i]
@@ -256,7 +252,6 @@ def Sim_energy_OP(typet, conf, X):
  BC = AR / AC
      
  return AAE, NPV, BC
-
 #
 
 
