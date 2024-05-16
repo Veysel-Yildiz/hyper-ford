@@ -75,7 +75,7 @@ def Opt_energy_single(typet, conf, X):
  penalty = 19999990
 
  if V_d > 9 or V_d < 2.5:
-     return -penalty * V_d
+     return penalty * V_d
 
  # choose turbine characteristics
  kmin, var_name_cavitation, func_Eff = HP.turbine_characteristics[typet]
@@ -91,7 +91,7 @@ def Opt_energy_single(typet, conf, X):
  ss_S = 214 / 60 * math.sqrt(Q_design) / (HP.g * design_h) ** 0.75
 
  if var_name_cavitation[1] <= ss_S or ss_L <= var_name_cavitation[0]:
-    return -penalty * V_d  # turbine type is not appropriate return
+    return penalty * V_d  # turbine type is not appropriate return
 
  # Calculate q as the minimum of Q and Od
  q = np.minimum(Q, Q_design) 
@@ -187,7 +187,7 @@ def Opt_energy_OP(typet, conf, X):
  penalty = 19999990
  
  if V_d > 9 or V_d < 2.5:
-    return -penalty * V_d
+    return penalty * V_d
 
  # choose turbine characteristics
  kmin, var_name_cavitation, func_Eff = HP.turbine_characteristics[typet]
@@ -212,10 +212,11 @@ def Opt_energy_OP(typet, conf, X):
       SSn[1] = 0
 
  if sum(SSn) < 2:  # turbine type is not appropriate
-     return -penalty * V_d 
+     return penalty * V_d 
 
 
  DailyPower = operation_optimization(maxturbine, Qturbine, Q_design, D, kmin, func_Eff)
+ 
  AAE = np.mean(DailyPower) * HP.hr / 10 ** 6  # Gwh Calculate average annual energy
 
  costP = cost(design_ic, design_h, typet, conf, D)
