@@ -64,6 +64,8 @@ eff_francis = EffCurves[:,2] #Francis turbine efficiency
 
 eff_pelton = EffCurves[:,3] #Pelton turbine efficiency
 
+
+ 
 ###############################################################################
 ###################################### do not change this parameters ############
 ##Model setup 
@@ -79,3 +81,10 @@ np = [0.005, 0.0612];     # specific spped range of pelton turbine
 mf = 0.40;                # min francis turbine design flow rate
 mk = 0.20;                # min kaplan turbine design flow rate
 mp = 0.11;                # min pelton turbine design flow rate
+
+ # Define turbine characteristics and functions in a dictionary
+turbine_characteristics = {
+    2: (mf, nf, eff_francis),   # Francis turbine
+    3: (mp, np, eff_pelton),     # Pelton turbine
+    1: (mk, nk, eff_kaplan),     # Other turbine type
+}

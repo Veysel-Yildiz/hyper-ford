@@ -32,15 +32,15 @@ def opt_config(x):
     
  typet = round(x[0])
  conf = round(x[1])
- X =  np.array([x[2], x[3], x[4]]) # np.array([D, Q1, Q2])
+ X_in =  np.array([x[2], x[3], x[4]]) # np.array([D, Q1, Q2])
 
     
  if conf == 1: # 1 turbine
-  return  Opt_energy_single (typet, conf, X)
+  return  Opt_energy_single (typet, 1, X_in)
 
  
  else: #conf == 2: more than 1 turbine
-  return  Opt_energy_OP (typet, conf, X)
+  return  Opt_energy_OP (typet, conf, X_in)
 
    
  

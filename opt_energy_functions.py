@@ -11,7 +11,6 @@
 """  Return :
 
          OF : Objective Function  
-
 --------------------------------------
         
     Inputs :
@@ -74,97 +73,74 @@ def Opt_energy_single(typet, conf, X):
  V_d = 4 * Q_design / ( math.pi * D**2 )
  
  penalty = 19999990
+
  if V_d > 9 or V_d < 2.5:
-    OF = -penalty*V_d
- else:
+     return -penalty * V_d
 
-# choose turbine
-  if typet == 2: # Francis turbine
-     kmin = HP.mf;
-     var_name_cavitation = HP.nf #specific speed range
-     func_Eff = HP.eff_francis
-    
-  elif typet == 3: #Pelton turbine
-     kmin = HP.mp;
-     var_name_cavitation = HP.np #specific speed range
-     func_Eff = HP.eff_pelton
-    
-  else:
-     kmin = HP.mk
-     var_name_cavitation = HP.nk #specific speed range
-     func_Eff = HP.eff_kaplan
-     
-     
-  ##head losses
-  hf_d = f_d*(HP.L/D)*V_d**2/(2*HP.g)*1.1 # 10% of local losses
- #hl_d = HP.K_sum*V_d^2/(2*HP.g);
+ # choose turbine characteristics
+ kmin, var_name_cavitation, func_Eff = HP.turbine_characteristics[typet]
 
-  design_h = HP.hg - hf_d # design head
- 
-  design_ic   = design_h * HP.g  * Q_design # installed capacity
- 
-##  Now check the specific speeds of turbines 
+ ##head losses
+ hf_d = f_d * (HP.L / D) * V_d ** 2 / (2 * HP.g) * 1.1  # 10% of local losses
+ design_h = HP.hg - hf_d  # design head
 
-  ss_L = 3000/60 * math.sqrt(Q_design)/(HP.g*design_h )**0.75;
-  ss_S = 214/60 * math.sqrt(Q_design)/(HP.g*design_h  )**0.75;
+ design_ic = design_h * HP.g * Q_design  # installed capacity 
 
-  if var_name_cavitation[1] <= ss_S  or ss_L <= var_name_cavitation[0]:
-      OF = -penalty*V_d  # turbine type is not apropriate return
-  else:
+ ##  Now check the specific speeds of turbines
+ ss_L = 3000 / 60 * math.sqrt(Q_design) / (HP.g * design_h) ** 0.75
+ ss_S = 214 / 60 * math.sqrt(Q_design) / (HP.g * design_h) ** 0.75
 
-# Calculate q as the minimum of Q and Od
-   q = np.minimum(Q, Q_design)
- 
+ if var_name_cavitation[1] <= ss_S or ss_L <= var_name_cavitation[0]:
+    return -penalty * V_d  # turbine type is not appropriate return
+
+ # Calculate q as the minimum of Q and Od
+ q = np.minimum(Q, Q_design) 
+
+
  # Interpolate values from func_Eff based on qt/Od ratio
-   n = np.interp(q / Q_design, perc, func_Eff)
+ n = np.interp(q / Q_design, perc, func_Eff)
  
  
  # Set qt and nrc to zero where qt is less than kmin * Od
-   idx = q < kmin * Q_design
-   n[idx] = 0
+ idx = q < kmin * Q_design
+ n[idx] = 0
 
  # Calculate the Reynolds number
-   Re = 4 * q / (np.pi * D * ve)
+ Re = 4 * q / (np.pi * D * ve)
 
  # Find f, the friction factor [-]
-   f = moody(ed, Re)
+ f = moody(ed, Re)
 
  # Calculate flow velocity in the pipe
-   V = 4 * q / (np.pi * D**2)
+ V = 4 * q / (np.pi * D**2)
 
  # Calculate the head loss due to friction in the penstock
-   hnet = hg - f * (L / D) * V**2 / (19.62 * 1.1)
+ hnet = hg - f * (L / D) * V**2 / (19.62 * 1.1)
 
  # Calculate power
-   DailyPower = hnet * q * 9.81 * n * ng
+ DailyPower = hnet * q * 9.81 * n * ng
  
-   AAE = np.mean(DailyPower) * HP.hr / 10**6  # Gwh Calculate average annual energy
-  
-  
-   costP = cost(design_ic, design_h, typet, conf, D);
+ AAE = np.mean(DailyPower) * HP.hr / 10 ** 6  # Gwh Calculate average annual energy
 
-  #Unpack costs
-   cost_em = costP[0]
-   cost_pen = costP[1] 
-   cost_ph = costP[2] #tp = costP(3);
+ costP = cost(design_ic, design_h, typet, conf, D)
 
-   cost_cw = HP.cf * (cost_pen + cost_em ) #(in dollars) civil + open channel + Tunnel cost
+ # Unpack costs
+ cost_em, cost_pen, cost_ph = costP[0], costP[1], costP[2]
 
-   Cost_other = cost_pen + cost_ph + cost_cw #Determine total cost (with cavitation)
+ cost_cw = HP.cf * (cost_pen + cost_em)
+ Cost_other = cost_pen + cost_ph + cost_cw
 
-   T_cost = cost_em * (1+ HP.tf) + Cost_other + HP.fxc;
+ T_cost = cost_em * (1 + HP.tf) + Cost_other + HP.fxc
+ cost_OP = cost_em * HP.om
+ AR = AAE * HP.ep * 0.98
 
-   cost_OP = cost_em * HP.om #operation and maintenance cost
+ AC = HP.CRF * T_cost + cost_OP
 
-   AR = AAE * HP.ep*0.98 # AnualRevenue in M dollars 2% will not be sold
+ if ObjectiveF == 1:
+     OF = (AR - AC) / HP.CRF
+ elif ObjectiveF == 2:
+     OF = AR / AC
 
-   AC = HP.CRF * T_cost + cost_OP; # Anual cost in M dollars
-
-   if ObjectiveF == 1:
-        OF = (AR - AC ) / HP.CRF
-   elif ObjectiveF == 2:
-        OF = AR / AC
-     
  return -OF
  
 
@@ -195,101 +171,74 @@ def Opt_energy_OP(typet, conf, X):
 
  Od1 = Qturbine[0]
  Od2 = Qturbine[1]
-
- Q_design = np.sum(Qturbine)  # find design discharge
  
- ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
-
- #design head ------------------------------------------
-
- Re_d = 4 * Q_design / ( math.pi * D * HP.v ) #Calculate the Reynolds number for design head
-
- # Find f, the friction factor [-] for design head
- f_d = moody ( ed , np.array([Re_d]) )
-
- # Claculate flow velocity in the pipe for design head
- V_d = 4 * Q_design / ( math.pi * D**2 )
+ # Design head calculation
+ Q_design = np.sum(Qturbine) # find design discharge
+ 
+ ed = HP.e / D               # calculate the relative roughness: epsilon / diameter.
+ 
+ Re_d = 4 * Q_design / (math.pi * D * HP.v) #Calculate the Reynolds number for design head
+ 
+ f_d = moody(ed, np.array([Re_d]))  # Find f, the friction factor [-] for design head
+ 
+ V_d = 4 * Q_design / (math.pi * D ** 2)# Claculate flow velocity in the pipe for design head
+ 
  
  penalty = 19999990
  
  if V_d > 9 or V_d < 2.5:
-    OF = -penalty*V_d
- else:
+    return -penalty * V_d
 
-# choose turbine
-   if typet == 2: # Francis turbine
-     kmin = HP.mf
-     var_name_cavitation = HP.nf #specific speed range
-     func_Eff = HP.eff_francis
-    
-   elif typet == 3: #Pelton turbine
-     kmin = HP.mp
-     var_name_cavitation = HP.np #specific speed range
-     func_Eff = HP.eff_pelton
-    
-   else:
-     kmin = HP.mk
-     var_name_cavitation = HP.nk #specific speed range
-     func_Eff = HP.eff_kaplan
+ # choose turbine characteristics
+ kmin, var_name_cavitation, func_Eff = HP.turbine_characteristics[typet]
 
-   # head losses
-   hf_d = f_d*(HP.L/D)*V_d**2/(2*HP.g)*1.1 # 10% of local losses
- #hl_d = HP.K_sum*V_d^2/(2*HP.g);
-
-   design_h = HP.hg - hf_d # design head
+# head losses
+ hf_d = f_d * (HP.L / D) * V_d ** 2 / (2 * HP.g) * 1.1  # 10% of local losses,#hl_d = HP.K_sum*V_d^2/(2*HP.g);
  
-   design_ic   = design_h * HP.g  * Q_design # installed capacity
-
- # Now check the specific speeds of turbines 
-  ##  Now check the specific speeds of turbines 
-
-   ss_L1 = 3000/60 * math.sqrt(Od1)/(HP.g*design_h )**0.75
-   ss_S1 = 214/60 * math.sqrt(Od1)/(HP.g*design_h  )**0.75
+ design_h = HP.hg - hf_d  # design head
  
-   ss_L2 = 3000/60 * math.sqrt(Od2)/(HP.g*design_h )**0.75
-   ss_S2 = 214/60 * math.sqrt(Od2)/(HP.g*design_h  )**0.75
- 
-   SSn = [1,1]
-   if var_name_cavitation[1]  <= ss_S1  or ss_L1 <= var_name_cavitation[0]:
-      SSn[0] = 0
+ design_ic = design_h * HP.g * Q_design  # installed capacity
 
-   if var_name_cavitation[1]  <= ss_S2  or ss_L2 <= var_name_cavitation[0]:
+ # Now check the specific speeds of turbines
+ ss_L1 = 3000 / 60 * math.sqrt(Od1) / (HP.g * design_h) ** 0.75
+ ss_S1 = 214 / 60 * math.sqrt(Od1) / (HP.g * design_h) ** 0.75
+ ss_L2 = 3000 / 60 * math.sqrt(Od2) / (HP.g * design_h) ** 0.75
+ ss_S2 = 214 / 60 * math.sqrt(Od2) / (HP.g * design_h) ** 0.75
+
+ SSn = [1, 1]
+ if var_name_cavitation[1] <= ss_S1 or ss_L1 <= var_name_cavitation[0]:
+     SSn[0] = 0
+ if var_name_cavitation[1] <= ss_S2 or ss_L2 <= var_name_cavitation[0]:
       SSn[1] = 0
 
-   if sum(SSn) < 2: # turbine type is not apropriate return
-      OF = -penalty*V_d 
-   else: 
+ if sum(SSn) < 2:  # turbine type is not appropriate
+     return -penalty * V_d 
 
 
-    DailyPower = operation_optimization(maxturbine, Qturbine, Q_design, D,  kmin,  func_Eff)
- 
-    AAE = np.mean(DailyPower) * HP.hr / 10**6  # Gwh Calculate average annual energy
-    
-    costP = cost(design_ic, design_h, typet, conf, D);
+ DailyPower = operation_optimization(maxturbine, Qturbine, Q_design, D, kmin, func_Eff)
+ AAE = np.mean(DailyPower) * HP.hr / 10 ** 6  # Gwh Calculate average annual energy
 
-  #Unpack costs
-    cost_em  = costP[0]
-    cost_pen = costP[1] 
-    cost_ph  = costP[2] #tp = costP(3);
+ costP = cost(design_ic, design_h, typet, conf, D)
 
-    cost_cw = HP.cf * (cost_pen + cost_em ) #(in dollars) civil + open channel + Tunnel cost
+ # Unpack costs
+ cost_em, cost_pen, cost_ph = costP[0], costP[1], costP[2]
 
-    Cost_other = cost_pen + cost_ph + cost_cw #Determine total cost (with cavitation)
+ cost_cw = HP.cf * (cost_pen + cost_em)
+ Cost_other = cost_pen + cost_ph + cost_cw
 
-    T_cost = cost_em * (1+ HP.tf) + Cost_other + HP.fxc;
+ T_cost = cost_em * (1 + HP.tf) + Cost_other + HP.fxc
+ cost_OP = cost_em * HP.om
+ AR = AAE * HP.ep * 0.98
 
-    cost_OP = cost_em * HP.om #operation and maintenance cost
+ AC = HP.CRF * T_cost + cost_OP
 
-    AR = AAE * HP.ep*0.98 # AnualRevenue in M dollars 2% will not be sold
-
-    AC = HP.CRF * T_cost + cost_OP; # Anual cost in M dollars
-
-    if ObjectiveF == 1:
-         OF = (AR - AC ) / HP.CRF
-    elif ObjectiveF == 2:
-         OF = AR / AC
+ if ObjectiveF == 1:
+     OF = (AR - AC) / HP.CRF
      
- return -OF #, costP , AC, AR
+ elif ObjectiveF == 2:
+     OF = AR / AC
+
+ return -OF 
 
 ##
 

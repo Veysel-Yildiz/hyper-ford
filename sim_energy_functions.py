@@ -8,9 +8,9 @@
 """
 """  Return :
 
-  DailyPower: Daily energy generation
          AAE: Annual average energy
-         OF : Objective Function  
+        NPV : Net Present Value in million USD
+        BC  : Benefot to Cost Ratio
 
 --------------------------------------
         
@@ -59,22 +59,10 @@ def Sim_energy_single(typet, conf, X):
  D = X[0] # diameter
  Q_design = X[1] # design discharge
  
-  # choose turbine characteristics
- if typet == 2: # Francis turbine
-    kmin = HP.mf # min flow
-    var_name_cavitation = HP.nf #specific speed range
-    func_Eff = HP.eff_francis # efficiency curve
-    
- elif typet == 3: #Pelton turbine
-    kmin = HP.mp # min flow
-    var_name_cavitation = HP.np #specific speed range
-    func_Eff = HP.eff_pelton# efficiency curve
-    
- else:
-    kmin = HP.mk # min flow
-    var_name_cavitation = HP.nk #specific speed range
-    func_Eff = HP.eff_kaplan# efficiency curve
-    
+ 
+   # choose turbine characteristics
+ kmin, var_name_cavitation, func_Eff = HP.turbine_characteristics[typet]
+
  ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
 
  #design head ------------------------------------------
@@ -147,17 +135,15 @@ def Sim_energy_single(typet, conf, X):
 
  cost_OP = cost_em * HP.om #operation and maintenance cost
 
-
  AR = AAE * HP.ep*0.98 # AnualRevenue in M dollars 2% will not be sold
 
  AC = HP.CRF * T_cost + cost_OP; # Anual cost in M dollars
 
- if ObjectiveF == 1:
-        OF = (AR - AC ) / HP.CRF
- elif ObjectiveF == 2:
-     OF = AR / AC
+ NPV = (AR - AC ) / HP.CRF
+ 
+ BC = AR / AC
      
- return P, AAE, OF
+ return AAE, NPV, BC
 
 ##
   
@@ -192,23 +178,9 @@ def Sim_energy_OP(typet, conf, X):
 
  Q_design = np.sum(Qturbine)  # find design discharge
 
- 
- # choose turbine characteristics
- if typet == 2: # Francis turbine
-    kmin = HP.mf
-    var_name_cavitation = HP.nf #specific speed range
-    func_Eff = HP.eff_francis
-    
- elif typet == 3: #Pelton turbine
-    kmin = HP.mp
-    var_name_cavitation = HP.np #specific speed range
-    func_Eff = HP.eff_pelton
-    
- else:
-    kmin = HP.mk
-    var_name_cavitation = HP.nk #specific speed range
-    func_Eff = HP.eff_kaplan
- 
+
+  # choose turbine characteristics
+ kmin, var_name_cavitation, func_Eff = HP.turbine_characteristics[typet]
 
  ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
 
@@ -278,12 +250,12 @@ def Sim_energy_OP(typet, conf, X):
 
  AC = HP.CRF * T_cost + cost_OP; # Anual cost in M dollars
 
- if ObjectiveF == 1:
-        OF = (AR - AC ) / HP.CRF
- elif ObjectiveF == 2:
-      OF = AR / AC
+
+ NPV = (AR - AC ) / HP.CRF
+ 
+ BC = AR / AC
      
- return DailyPower, AAE, OF
+ return AAE, NPV, BC
 
 #
 

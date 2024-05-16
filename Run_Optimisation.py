@@ -41,11 +41,11 @@ from opt_operation_type import opt_config
 
 ##Structure of DE optimisation
 
-bounds = [(0.51,3.49), (0.51,3.49), (1, 5), (1, 20), (1, 10)]
+bounds = [(0.51,3.49), (0.51,3.49), (1, 5), (1, 20), (1, 20)]
 
 #result = differential_evolution(opt_config, bounds)
 
-result = differential_evolution(opt_config, bounds, maxiter=10, 
+result = differential_evolution(opt_config, bounds, maxiter=100, 
         popsize=10, tol=0.001, mutation=(0.5, 1), recombination=0.7, init='latinhypercube')
 
 #result = differential_evolution(opt_config, bounds, updating='deferred', workers=-1)

@@ -8,9 +8,9 @@
 """
 """ Return :
     
-          P: Daily power
-        AAE: Annual average energy
-        OF : Objective Function  
+       AAE : Annual average energy
+       NPV : Net Present Value in million USD
+       BC  : Benefot to Cost Ratio
         
 --------------------------------------
          
@@ -33,10 +33,10 @@ from sim_energy_functions import *
 def sim_config( typet, conf, X): 
     
     if conf == 1: # 1 turbine
-        [P,  AAE, OF] = Sim_energy_single ( typet, conf, X);
+        [AAE, NPV, BC] = Sim_energy_single ( typet, conf, X);
 
         
     else: # 2 or more turbine
-        [P,  AAE, OF] = Sim_energy_OP (typet, conf, X);
+        [AAE,  NPV, BC] = Sim_energy_OP (typet, conf, X);
       
-    return P,  AAE, OF
+    return AAE,  NPV, BC
