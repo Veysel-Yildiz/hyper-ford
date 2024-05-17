@@ -57,7 +57,6 @@ def opt_config(x):
     else: #conf == 2: more than 1 turbine
       return  Opt_energy_OP (typet, conf, X_in)
 
-
 # Set the number of turbines for optimization
 numturbine = 2  # Example: optimization up to two turbine configurations
 bounds = generate_bounds(numturbine)
@@ -67,8 +66,8 @@ bounds = generate_bounds(numturbine)
 result = differential_evolution(
     opt_config, 
     bounds, 
-    maxiter=200, 
-    popsize=20, 
+    maxiter=10, 
+    popsize=10, 
     tol=0.001, 
     mutation=(0.5, 1), 
     recombination=0.7, 

@@ -22,28 +22,40 @@ Return :
        BC  : Benefot to Cost Ratio
 """
 
-# Import  the modules to be used from Library
 import numpy as np
+import pandas as pd
+import json
 
-# Import  the all the functions defined
-from sim_energy_functions import Sim_energy_single, Sim_energy_OP
+from sim_energy_functions import Sim_energy
 
-def sim_config( typet, conf, X): 
-    if conf == 1: # 1 turbine
-        [AAE, NPV, BC] = Sim_energy_single ( typet, conf, X);
-    else: # 2 or more turbine
-        [AAE,  NPV, BC] = Sim_energy_OP (typet, conf, X); 
-    return AAE,  NPV, BC
+# Load the input data set
+streamflow = np.loadtxt('input/b_observed.txt', dtype=float, delimiter=',')
+MFD = 0.63  # the minimum environmental flow (m3/s)
 
-# Setup the model
-typet =  2   # turbine type: 1 = Kaplan, 2 = Francis, 3= Pelton
-conf = 2  # turbine config: 1 = single, 2 = dual, 3 = triple
-D = 2 # as m
-Q1 = 5 #as m3/s, design discharge of first turbine
-Q2 = 10# as m3/s, design discharge of second turbine
+# Define discharge after environmental flow
+Q = np.maximum(streamflow - MFD, 0)
 
-X =  np.array([D, Q1, Q2])
+# Load the parameters from the JSON file
+with open('global_parameters.json', 'r') as json_file:
+    global_parameters = json.load(json_file)
 
-AAE,  NPV, BC = sim_config (typet, conf, X);
+# Define turbine characteristics and functions in a dictionary
+turbine_characteristics = {
+    2: (global_parameters["mf"], global_parameters["nf"], global_parameters["eff_francis"]),# Francis turbine
+    3: (global_parameters["mp"], global_parameters["np"], global_parameters["eff_pelton"]),# Pelton turbine
+    1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
+}
 
-print(AAE,  NPV, BC)
+# Setup the simulation model
+typet = 2   # turbine type: 1 = Kaplan, 2 = Francis, 3 = Pelton
+conf = 2    # turbine config: 1 = single, 2 = dual, 3 = triple
+D = 2       # diameter (m)
+Q1 = 5      # design discharge of first turbine (m3/s)
+Q2 = 10     # design discharge of second turbine (m3/s)
+
+X = np.array([D, Q1, Q2])
+
+# Calculate simulation results
+AAE, NPV, BC = Sim_energy(Q, typet, conf, X, global_parameters, turbine_characteristics)
+
+print(AAE, NPV, BC)

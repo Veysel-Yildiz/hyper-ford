@@ -8,7 +8,7 @@
 """ Return :
 op_table: optimization table constructed with the optimization result parameters,
  including the objective function value, turbine type, turbine configuration, 
- diameter, and design discharges. 
+ penstock diameter, and turbine design discharges. 
 --------------------------------------
   Inputs:
 

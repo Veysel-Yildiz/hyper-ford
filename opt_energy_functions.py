@@ -37,16 +37,12 @@ from model_functions import moody, cost, operation_optimization
 ## unpack global variables
 ObjectiveF = HP.ObjectiveF
 perc = HP.perc
-L = HP.L
-ve = HP.v
 hg = HP.hg
-ng = HP.ng
+L = HP.L
 Q = HP.Q
 
 maxT = len(Q)    # the size of time steps
-P = np.empty((maxT)) #  create a new array for daily power
-P[:] = np.NaN
- 
+
 ## SINGLE turbine operation ###################################################
 
 def Opt_energy_single(typet, conf, X):
@@ -54,36 +50,37 @@ def Opt_energy_single(typet, conf, X):
  #Unpack the parameter values
  D = X[0] # diameter
  Q_design = X[1] # design discharge
-  
- ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
 
- #design head ------------------------------------------
-
- Re_d = 4 * Q_design / ( math.pi * D * HP.v ) #Calculate the Reynolds number for design head
-
-# Find f, the friction factor [-] for design head
- f_d = moody ( ed , np.array([Re_d]) )
+  #design head ------------------------------------------
 
 # Claculate flow velocity in the pipe for design head
- V_d = 4 * Q_design / ( math.pi * D**2 )
+ V_d = 4 * Q_design / ( np.pi * D**2 )
  
  penalty = 19999990
 
  if V_d > 9 or V_d < 2.5:
      return penalty * V_d
+ 
+ #Calculate the Reynolds number for design head
+ Re_d =  V_d * D / 10**-6  # kinematic viscosity ν = 1,002 · 10−6 m2∕s
 
+ ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
+
+# Find f, the friction factor [-] for design head
+ f_d = moody ( ed , np.array([Re_d]) )
+ 
  # choose turbine characteristics
  kmin, var_name_cavitation, func_Eff = HP.turbine_characteristics[typet]
 
  ##head losses
- hf_d = f_d * (HP.L / D) * V_d ** 2 / (2 * HP.g) * 1.1  # 10% of local losses
+ hf_d = f_d * (HP.L / D) * V_d ** 2 / (2 * 9.81) * 1.1  # 10% of local losses
  design_h = HP.hg - hf_d  # design head
 
- design_ic = design_h * HP.g * Q_design  # installed capacity 
+ design_ic = design_h * 9.81 * Q_design  # installed capacity 
 
  ##  Now check the specific speeds of turbines
- ss_L = 3000 / 60 * math.sqrt(Q_design) / (HP.g * design_h) ** 0.75
- ss_S = 214 / 60 * math.sqrt(Q_design) / (HP.g * design_h) ** 0.75
+ ss_L = 3000 / 60 * math.sqrt(Q_design) / (9.81 * design_h) ** 0.75
+ ss_S = 214 / 60 * math.sqrt(Q_design) / (9.81 * design_h) ** 0.75
 
  if var_name_cavitation[1] <= ss_S or ss_L <= var_name_cavitation[0]:
     return penalty * V_d  # turbine type is not appropriate return
@@ -100,20 +97,20 @@ def Opt_energy_single(typet, conf, X):
  idx = q < kmin * Q_design
  n[idx] = 0
 
- # Calculate the Reynolds number
- Re = 4 * q / (np.pi * D * ve)
-
+ # Calculate flow velocity in the pipe
+ V = 4 * q / (np.pi * D**2)
+ 
+ #Calculate the Reynolds number 
+ Re =  V * D / 10**-6  # kinematic viscosity ν = 1,002 · 10−6 m2∕s
+ 
  # Find f, the friction factor [-]
  f = moody(ed, Re)
 
- # Calculate flow velocity in the pipe
- V = 4 * q / (np.pi * D**2)
-
  # Calculate the head loss due to friction in the penstock
- hnet = hg - f * (L / D) * V**2 / (19.62 * 1.1)
+ hnet = hg - f * (L / D) * V**2 / 19.62 * 1.1
 
  # Calculate power
- DailyPower = hnet * q * 9.81 * n * ng
+ DailyPower = hnet * q * 9.81 * n * 0.98
  
  AAE = np.mean(DailyPower) * HP.hr / 10 ** 6  # Gwh Calculate average annual energy
 
@@ -170,35 +167,38 @@ def Opt_energy_OP(typet, conf, X):
  # Design head calculation
  Q_design = np.sum(Qturbine) # find design discharge
  
- ed = HP.e / D               # calculate the relative roughness: epsilon / diameter.
- 
- Re_d = 4 * Q_design / (math.pi * D * HP.v) #Calculate the Reynolds number for design head
- 
- f_d = moody(ed, np.array([Re_d]))  # Find f, the friction factor [-] for design head
- 
- V_d = 4 * Q_design / (math.pi * D ** 2)# Claculate flow velocity in the pipe for design head
- 
+ # Claculate flow velocity in the pipe for design head
+ V_d = 4 * Q_design / ( np.pi * D**2 )
  
  penalty = 19999990
- 
+
  if V_d > 9 or V_d < 2.5:
-    return penalty * V_d
+     return penalty * V_d
+ 
+ #Calculate the Reynolds number for design head
+ Re_d =  V_d * D / 10**-6  # kinematic viscosity ν = 1,002 · 10−6 m2∕s
+
+ ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
+
+# Find f, the friction factor [-] for design head
+ f_d = moody ( ed , np.array([Re_d]) )
+ 
 
  # choose turbine characteristics
  kmin, var_name_cavitation, func_Eff = HP.turbine_characteristics[typet]
 
 # head losses
- hf_d = f_d * (HP.L / D) * V_d ** 2 / (2 * HP.g) * 1.1  # 10% of local losses,#hl_d = HP.K_sum*V_d^2/(2*HP.g);
+ hf_d = f_d * (HP.L / D) * V_d ** 2 / (2 * 9.81) * 1.1  # 10% of local losses,#hl_d = HP.K_sum*V_d^2/(2*HP.g);
  
  design_h = HP.hg - hf_d  # design head
  
- design_ic = design_h * HP.g * Q_design  # installed capacity
+ design_ic = design_h * 9.81 * Q_design  # installed capacity
 
  # Now check the specific speeds of turbines
- ss_L1 = 3000 / 60 * math.sqrt(Od1) / (HP.g * design_h) ** 0.75
- ss_S1 = 214 / 60 * math.sqrt(Od1) / (HP.g * design_h) ** 0.75
- ss_L2 = 3000 / 60 * math.sqrt(Od2) / (HP.g * design_h) ** 0.75
- ss_S2 = 214 / 60 * math.sqrt(Od2) / (HP.g * design_h) ** 0.75
+ ss_L1 = 3000 / 60 * math.sqrt(Od1) / (9.81 * design_h) ** 0.75
+ ss_S1 = 214 / 60 * math.sqrt(Od1) / (9.81 * design_h) ** 0.75
+ ss_L2 = 3000 / 60 * math.sqrt(Od2) / (9.81 * design_h) ** 0.75
+ ss_S2 = 214 / 60 * math.sqrt(Od2) / (9.81 * design_h) ** 0.75
 
  SSn = [1, 1]
  if var_name_cavitation[1] <= ss_S1 or ss_L1 <= var_name_cavitation[0]:

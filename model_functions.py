@@ -9,14 +9,11 @@
 
 # Import  the modules to be used from Library
 import numpy as np
-import math 
 from itertools import combinations
 
-# Import global parameters including site characteristics and streamflow records
-import HP
 
 ##################################################COST#########################
-def cost(design_ic, design_h, typet, conf, D):
+def cost(design_ic, design_h, typet, conf, D, global_parameters):
 
  """ Return:
      cost_em : Electro-mechanic (turbine) cost in million USD
@@ -32,13 +29,17 @@ def cost(design_ic, design_h, typet, conf, D):
       conf : turbine configuration; single, dual, triple
          D : penstock diameter
  """
+ case_specific = global_parameters["case_specific"]
+ pt = case_specific["pt"]
+ L = case_specific["L"]
+ 
  tp  = 8.4/1000*D + 0.002 # Thickness of the pipe  [m]
 
  #tp1 = (1.2 * HP.hd * D / ( 20* 1.1) +2)*0.1; #t = (head + water hammer head (20%))*D / The working stress of the steel * 2
  #tp2 = (D + 0.8) / 4; % min thickness in cm
  #tp = max(tp1, tp2)/100;% min thickness in m
 
- cost_pen = math.pi * tp * D * HP.L * 7.874 * HP.pt/10**6;
+ cost_pen = np.pi * tp * D * L * 7.874 * pt/10**6;
 
  #Calculate the cost of power house (in M dollars)
  cost_ph = 200 * (design_ic/1000)**-0.301  * design_ic/10**6;
@@ -169,12 +170,12 @@ def generate_patterns(maxturbine):
 
 ################################################## daily power #############################
 
-def operation_optimization(maxturbine, Qturbine, Q_design, D,  kmin,  func_Eff):
-   
+def operation_optimization(Q, maxturbine, Qturbine, Q_design, D,  kmin,  func_Eff, global_parameters):
+    
   """ Return dailyPower, daily generated power output based on operation optimization
 --------------------------------------
   Inputs:
-
+           Q : daily discharge
   maxturbine : Number of turbines
     Qturbine : Turbine's design discharge
            D : Penstock diameter
@@ -183,12 +184,12 @@ def operation_optimization(maxturbine, Qturbine, Q_design, D,  kmin,  func_Eff):
 
  """ 
   ## unpack global variables
-
-  perc = HP.perc
-  L = HP.L
-  ve = HP.v
-  hg = HP.hg
-  Q  = HP.Q
+  e = global_parameters["e"]
+  case_specific = global_parameters["case_specific"]
+  L = case_specific["L"]
+  hg = case_specific["hg"]
+  perc  = global_parameters["perc"]
+   
   maxT = len(Q)    # the size of time steps
   
   Ns = 1000 # size of the random sample 
@@ -234,17 +235,21 @@ def operation_optimization(maxturbine, Qturbine, Q_design, D,  kmin,  func_Eff):
      # Update q and nP arrays
      q += qi
      Eff_q += Eff_qi
-
-     # Calculate the Reynolds number
-     Re = 4 * q / (np.pi * D * ve)
      
-     ed = HP.e / D # calculate the relative roughness: epsilon / diameter.
+     
+      # Calculate flow velocity in the pipe
+     V = 4 * q / (np.pi * D**2)
+ 
+     #Calculate the Reynolds number 
+     Re =  V * D / 10**-6  # kinematic viscosity ν = 1,002 · 10−6 m2∕s
+ 
+     ed = e / D # calculate the relative roughness: epsilon / diameter.
      
      # Find f, the friction factor [-]
      f  = moody ( ed , Re )
 
     # Calculate the head loss due to friction in the penstock
-     hnet = hg - f * (L / D) * (4 * q / (np.pi * D**2))**2 / (19.62 * 1.1)
+     hnet = hg - f * (L / D) * V**2 / 19.62 * 1.1
 
     # Calculate DP
      DP = Eff_q * hnet * 9.6138  # DP = 9.81 * ng;

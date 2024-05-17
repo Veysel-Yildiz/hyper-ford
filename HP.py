@@ -17,15 +17,6 @@ import pandas as pd
 #import math 
 #import statistics
 
-# Load the input data set
-streamflow = np.loadtxt('input' + '/b_observed' + '.txt', dtype=float, delimiter=',')
-MFD = 0.63 # the minimum environmental flow (m3/s)
-
-Q = streamflow - MFD; # define discharge after environmental flow
-
-Q[Q < 0] = 0 # Set negative values to zero using NumPy indexing
-
-#####
 
 hg = 117.3 # initial storage elevation (m), gross head
 ht = 0  # tail water elevation, depth of outflow to stream (m)
@@ -52,9 +43,7 @@ operating_scheme = 1   #  1 = 1 small + identical, 2 = all identical, 3 = all va
 ##################################################
 # Define variables and interpolation function for the calculation of turbines efficiencies
 
-# Load the efficiency curves 
-Effcurves = pd.read_excel('input' + '/EffCurves' + '.xlsx', dtype=float)
-EffCurves = np.array(Effcurves)
+
 
 perc = EffCurves[:,0]
 
@@ -65,10 +54,10 @@ eff_francis = EffCurves[:,2] #Francis turbine efficiency
 eff_pelton = EffCurves[:,3] #Pelton turbine efficiency
 
 
- 
-###############################################################################
-###################################### do not change this parameters ############
 ##Model setup 
+
+# do not change this parameters
+
 
 e = 0.45*10**(-4);        # epsilon (m) ; fiberglass e = 5*10^(-6) (m), concrete e = 1.8*10^(-4) (m)
 v = 1.004*10**(-6);       # the kinematics viscosity of water (m2/s)
@@ -82,7 +71,8 @@ mf = 0.40;                # min francis turbine design flow rate
 mk = 0.20;                # min kaplan turbine design flow rate
 mp = 0.11;                # min pelton turbine design flow rate
 
- # Define turbine characteristics and functions in a dictionary
+
+# Define turbine characteristics and functions in a dictionary
 turbine_characteristics = {
     2: (mf, nf, eff_francis),   # Francis turbine
     3: (mp, np, eff_pelton),     # Pelton turbine
