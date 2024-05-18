@@ -1,26 +1,58 @@
 
-This repository contains Python code of HYPER HYdroPowER or HYPER, which uses a daily time step to simulate the technical performance, energy production, maintenance and operational costs, and economic profit of a RoR plant in response to a suite of different design and construction variables and record of river flows. The model includes a evolutionary algorithm that enables the user to maximize the RoR plant's power production or net economic profit by optimizing (among others) the penstock diameter, and the type (Kaplan, Francis, Pelton) design flow, and configuration (single/dual/triple) of the turbine system. What is more, it also simulates a predefined design.
-The toolbox introduced in the paper by  V. Yildiz, J. Vrugt, "A toolbox for the optimal design of run-of-river hydropower plants" Environmental Modelling & Software
-The library is built exclusively using Python code; It consists of following files. 
+HYPER: HYdroPowER Simulation and Optimization Toolbox
 
-Contents:
+Welcome to the HYPER repository! This repository contains Python code for HYPER (HYdroPowER), a comprehensive tool designed to simulate and optimize the performance of run-of-river (RoR) hydropower plants. The toolbox is built exclusively using Python and introduced in the paper by V. Yildiz and J. Vrugt, "A toolbox for the optimal design of run-of-river hydropower plants" published in Environmental Modelling &amp; Software.
 
-`HP.py`: This is the main input file that contains global parameters both for optimisation and simulation.
+Overview 
 
-`Run_Simulation.py`: This is the main file to run to simulate enrgy production based on predifined design parameters.
+HYPER uses a daily time step to simulate various aspects of RoR hydropower plants, including:
+Technical performance
+Energy production
+Maintenance and operational costs
+Economic profit
+
+The toolbox accounts for different design and construction variables and utilizes historical river flow records. It also includes an evolutionary algorithm to optimize various design parameters, such as:
+Penstock diameter
+Turbine type (Kaplan, Francis, Pelton)
+Turbine design flow
+Turbine configuration (single or multiple)
+
+Additionally, HYPER allows for the simulation of predefined designs.
+
+Contents
+
+global_parameters.json: Contains global parameters for both optimization and simulation.
+
+Run_Simulation.py: Main script to simulate energy production based on predefined design parameters.
+
+sim_energy_functions.py: Includes functions for daily power production and objective functions for single and multiple operation modes in simulations.
+
+model_functions.py: Contains all required sub-functions for the simulation and optimization processes.
+
+Run_Optimisation.py: Main script to optimize the design of an RoR project.
+
+opt_energy_functions.py: Includes functions for daily power production and objective functions for single and multiple operation modes in optimization.
+
+Getting Started
+
+Load Input Data: Ensure you have the necessary input data files, such as b_observed.txt, containing river flow records.
+
+Global Parameters: Modify the global_parameters.json file to suit your specific project requirements.
+
+Run Simulation: Use Run_Simulation.py to simulate energy production based on predefined design parameters.
+
+Run Optimization: Use Run_Optimisation.py to find the optimal design for your RoR hydropower plant.
+
+Usage
+
+To run a simulation: python Run_Simulation.py
+
+To run an optimization:python Run_Optimisation.py
 
 
-`sim_energy_functions.py`: This file contains mainly three functions that return daily power production and objective functions for SINGLE, DUAL and TRIPLE operation mode for simulation.
+License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-`model_functions.py`: This file contains two functions; (i) return the cost of a project in USD, (ii) returns the friction factor to calculate hydraulic losses. 
-
-`Run_Optimisation.py`: This is the main file to run to optimise a design of a project. 
-
-
-`opt_energy_functions.py`: This file contains mainly three functions that return daily power production and objective functions for SINGLE, DUAL and TRIPLE operation mode for simulation.
-
-`model_functions.py`: This file contains two functions; (i) return the cost of a project in USD, (ii) returns the friction factor to calculate hydraulic losses. 
-
-
-
+Acknowledgments
+The development of this toolbox was introduced in the paper by V. Yildiz and J. Vrugt, "A toolbox for the optimal design of run-of-river hydropower plants," published in Environmental Modelling &amp; Software.
 
