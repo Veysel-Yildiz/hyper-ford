@@ -28,6 +28,7 @@ def cost(design_ic, design_h, typet, conf, D, global_parameters):
      typet : turbine type
       conf : turbine configuration; single, dual, triple
          D : penstock diameter
+        pt : steel penstock price per ton ($)
  """
  case_specific = global_parameters["case_specific"]
  pt = case_specific["pt"]
@@ -181,6 +182,10 @@ def operation_optimization(Q, maxturbine, Qturbine, Q_design, D,  kmin,  func_Ef
            D : Penstock diameter
         kmin : Technical min flow rate of turbine to operate
     func_Eff : Efficiency curve
+          hg : gross head(m)
+           L : Penstock diameter (m)
+        perc : efficiency percentile.
+           e : epsilon (m) for the relative roughness
 
  """ 
   ## unpack global variables

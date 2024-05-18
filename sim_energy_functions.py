@@ -14,12 +14,23 @@
     Inputs :
 
 global_parameters : structure of global variables
-                Q : daily flow
-           typet : turbine type
-            conf : turbine configuration; single, dual, triple
-               X : array of design parameters;
-            X(1) : D, penstock diameter
-         X(2...) : tubine(s) design discharge
+                hg: gross head(m)
+                L : Penstock diameter (m)
+               cf : site factor, used for the cost of the civil works
+               om : maintenance and operation cost factor
+              fxc : expropriation and other costs including transmission line
+               ep :lectricity price in Turkey ($/kWh)
+               pt : steel penstock price per ton ($/ton)
+               ir : the investment discount rate (or interest rate)
+                N : life time of the project (years)
+ operating_scheme : turbine configuration setup 1 = 1 small + identical, 2 = all identical, 3 = all varied
+    
+Q : daily flow
+typet : turbine type
+conf : turbine configuration; single, dual, triple
+X : array of design parameters;
+X(1) : D, penstock diameter
+X(2...) : tubine(s) design discharge
 
 """
 
@@ -39,8 +50,8 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
     e, hr, perc = global_parameters["e"], global_parameters["hr"], global_parameters["perc"]
     
     # Calculate derived parameters
-    CRF = ir * (1 + ir)**N / ((1 + ir)**N - 1)
-    tf = 1 / (1 + ir)**25
+    CRF = ir * (1 + ir)**N / ((1 + ir)**N - 1) #capital recovery factor
+    tf = 1 / (1 + ir)**25 # 25 year of discount for electro-mechanic parts
     
     # Unpack the parameter values
     D = X[0]  # Diameter

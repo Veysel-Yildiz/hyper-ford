@@ -8,22 +8,32 @@
 """
 """ Main File to Run for simulation
 
-Parameters:
+Parameters to be used for simulation:
 x(1), typet:  Turbine type (1= Kaplan, 2= Francis, 3 = Pelton turbine)
 x(2), conf: Turbine configuration (1= Single, 2= Dual, 3 = Triple, ..nth Operation)
 x(3), D: Penstock diameter,
 x(4) Od1: First turbine design docharge,
 x(5) Od2: Second turbine design docharge,
 x(n) Odn: nth turbine design docharge,
-
+--------------------------------------
+global_parameters : structure of global variables
+                 nf : specific spped range of francis turbine
+                 nk : specific spped range of kaplan turbine
+                 np : specific spped range of pelton turbine
+                 mf : min francis turbine design flow rate
+                 mk : min kaplan turbine design flow rate
+                 mp : min pelton turbine design flow rate
+         eff_kaplan : Kaplan turbine efficiency
+        eff_francis : Francis turbine efficiency
+         eff_pelton : Pelton turbine efficiency
+--------------------------------------              
 Return :
-       AAE : Annual average energy
-       NPV : Net Present Value in million USD
-       BC  : Benefot to Cost Ratio
+       AAE : Annual average energy (GWh)
+       NPV : Net Present Value (million USD)
+       BC  : Benefot to Cost Ratio (-)
 """
 
 import numpy as np
-import pandas as pd
 import json
 
 from sim_energy_functions import Sim_energy
@@ -46,16 +56,22 @@ turbine_characteristics = {
     1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
 }
 
-# Setup the simulation model
+# Setup the model
 typet = 2   # turbine type: 1 = Kaplan, 2 = Francis, 3 = Pelton
-conf = 2    # turbine config: 1 = single, 2 = dual, 3 = triple
-D = 2       # diameter (m)
-Q1 = 5      # design discharge of first turbine (m3/s)
-Q2 = 10     # design discharge of second turbine (m3/s)
 
-X = np.array([D, Q1, Q2])
+# Define design discharge values
+Qdesign = [5, 10, 15]  # Add your design discharge values here
+
+# Set conf to the size of Qdesign
+conf = len(Qdesign)
+
+# Define diameter (m)
+D = 2       
+
+# Update X array with D and Qdesign values
+X = np.array([D] + Qdesign)
 
 # Calculate simulation results
 AAE, NPV, BC = Sim_energy(Q, typet, conf, X, global_parameters, turbine_characteristics)
 
-print(AAE, NPV, BC)
+print(f"AAE: {AAE} GWh, NPV: {NPV} million USD, BC: {BC}")
