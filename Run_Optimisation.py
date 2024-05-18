@@ -16,7 +16,7 @@ x(4) Od1: First turbine design docharge,
 x(5) Od2: Second turbine design docharge,
 x(n) Odn: nth turbine design docharge,
 --------------------------------------
-global_parameters : structure of global variables
+global_parameters : structure of global variables for turbine setup
                  nf : specific spped range of francis turbine
                  nk : specific spped range of kaplan turbine
                  np : specific spped range of pelton turbine

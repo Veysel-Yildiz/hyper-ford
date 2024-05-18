@@ -9,6 +9,7 @@
 """ Main File to Run for simulation
 
 Parameters to be used for simulation:
+    
 x(1), typet:  Turbine type (1= Kaplan, 2= Francis, 3 = Pelton turbine)
 x(2), conf: Turbine configuration (1= Single, 2= Dual, 3 = Triple, ..nth Operation)
 x(3), D: Penstock diameter,
@@ -16,7 +17,7 @@ x(4) Od1: First turbine design docharge,
 x(5) Od2: Second turbine design docharge,
 x(n) Odn: nth turbine design docharge,
 --------------------------------------
-global_parameters : structure of global variables
+global_parameters : structure of global variables for turbine setup
                  nf : specific spped range of francis turbine
                  nk : specific spped range of kaplan turbine
                  np : specific spped range of pelton turbine

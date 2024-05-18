@@ -5,20 +5,7 @@
 #                   The University of Sheffield,June 2024                  #
 ############################################################################
 """
-""" global_parameters 
-
-                hg: gross head(m)
-                L : Penstock diameter (m)
-               cf : site factor, used for the cost of the civil works
-               om : maintenance and operation cost factor
-              fxc : expropriation and other costs including transmission line
-               ep :lectricity price in Turkey ($/kWh)
-               pt : steel penstock price per ton ($/ton)
-               ir : the investment discount rate (or interest rate)
-                N : life time of the project (years)
- operating_scheme : turbine configuration setup 1 = 1 small + identical, 2 = all identical, 3 = all varied
-       ObjectiveF : the objective function to be maximized  1: NPV, 2: BC
-       
+""" global_parameters        
                 v : the kinematics viscosity of water (m2/s)
                 g : acceleration of gravity (m/s2)
                ng : generator-system efficiency
@@ -34,6 +21,19 @@
       eff_francis : Francis turbine efficiency
        eff_pelton : Pelton turbine efficiency
              perc : efficiency percentile.
+             
+                case_specific {These parameters can be changeg for each case study}
+                hg: gross head(m)
+                L : Penstock diameter (m)
+               cf : site factor, used for the cost of the civil works
+               om : maintenance and operation cost factor
+              fxc : expropriation and other costs including transmission line
+               ep : ectricity price in Turkey ($/kWh)
+               pt : steel penstock price per ton ($/ton)
+               ir : the investment discount rate (or interest rate)
+                N : life time of the project (years)
+ operating_scheme : turbine configuration setup 1 = 1 small + identical, 2 = all identical, 3 = all varied
+       ObjectiveF : the objective function to be maximized  1: NPV, 2: BC             
 
 """
 

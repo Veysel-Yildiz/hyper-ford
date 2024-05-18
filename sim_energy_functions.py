@@ -76,11 +76,12 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
         design_ic = design_h * 9.81 * Q_design  # Installed capacity
 
         # Check specific speeds of turbines
-        ss_L1 = 3000 / 60 * math.sqrt(Q_design) / (9.81 * design_h)**0.75
-        ss_S1 = 214 / 60 * math.sqrt(Q_design) / (9.81 * design_h)**0.75
+        ss_L = 3000 / 60 * math.sqrt(Q_design) / (9.81 * design_h)**0.75
+        ss_S = 214 / 60 * math.sqrt(Q_design) / (9.81 * design_h)**0.75
         
-        SS = 0 if var_name_cavitation[1] <=  ss_S1 or ss_L1 <= var_name_cavitation[0] else 1
-
+        if var_name_cavitation[1] <= ss_S or ss_L <= var_name_cavitation[0]:
+            return -999999  # turbine type is not appropriate return
+        
         # Calculate power
         q = np.minimum(Q, Q_design)  # Calculate q as the minimum of Q and Q_design
         n = np.interp(q / Q_design, perc, func_Eff)  # Interpolate values from func_Eff based on qt/Q_design ratio
@@ -127,11 +128,9 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
         if var_name_cavitation[1] <= ss_S2 or ss_L2 <= var_name_cavitation[0]:
             SSn[1] = 0
 
-        if sum(SSn) == 2:
-            SS = 1
-        else:
-            SS = 0
-
+        if sum(SSn) < 2:  # turbine type is not appropriate
+          return -999999
+      
         DailyPower = operation_optimization(Q, maxturbine, Qturbine, Q_design, D, kmin, func_Eff, global_parameters)
 
     AAE = np.mean(DailyPower) * hr / 1e6  # Gwh Calculate average annual energy
