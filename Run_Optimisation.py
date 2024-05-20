@@ -7,16 +7,8 @@
 ############################################################################
 """
 """ Main File to Run for optimization
-
-Parameters to be optimized:
-x(1), typet:  Turbine type (1= Kaplan, 2= Francis, 3 = Pelton turbine)
-x(2), conf: Turbine configuration (1= Single, 2= Dual, 3 = Triple, ..nth Operation)
-x(3), D: Penstock diameter,
-x(4) Od1: First turbine design docharge,
-x(5) Od2: Second turbine design docharge,
-x(n) Odn: nth turbine design docharge,
 --------------------------------------
-global_parameters : structure of global variables for turbine setup
+global_parameters (structure of global variables for turbine setup)
                  nf : specific spped range of francis turbine
                  nk : specific spped range of kaplan turbine
                  np : specific spped range of pelton turbine
@@ -29,7 +21,15 @@ global_parameters : structure of global variables for turbine setup
 --------------------------------------              
 Return :
          OF : Objective function, Net Present Value (million USD) or  Benefot to Cost Ratio (-)
-          X : Optimal design parameters
+          X : Optimal design parameters;
+          
+X(1), typet :  Turbine type (1= Kaplan, 2= Francis, 3 = Pelton turbine)
+ X(2), conf : Turbine configuration (1= Single, 2= Dual, 3 = Triple, ..nth Operation)
+    X(3), D : Penstock diameter,
+   X(4) Od1 : First turbine design docharge,
+   X(5) Od2 : Second turbine design docharge,
+   X(n) Odn : nth turbine design docharge,
+
 """
 
 # Import  the modules to be used from Library
@@ -96,8 +96,8 @@ start_time = time.time()
 result = differential_evolution(
     opt_config, 
     bounds, 
-    maxiter=50, 
-    popsize=500, 
+    maxiter=100, 
+    popsize=1000, 
     tol=0.001, 
     mutation=(0.5, 1), 
     recombination=0.7, 

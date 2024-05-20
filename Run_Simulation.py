@@ -17,7 +17,7 @@ x(4) Od1: First turbine design docharge,
 x(5) Od2: Second turbine design docharge,
 x(n) Odn: nth turbine design docharge,
 --------------------------------------
-global_parameters : structure of global variables for turbine setup
+global_parameters (structure of global variables for turbine setup);
                  nf : specific spped range of francis turbine
                  nk : specific spped range of kaplan turbine
                  np : specific spped range of pelton turbine
@@ -58,19 +58,13 @@ turbine_characteristics = {
 }
 
 # Setup the model
-typet = 2   # turbine type: 1 = Kaplan, 2 = Francis, 3 = Pelton
+typet = 2           # turbine type: 1 = Kaplan, 2 = Francis, 3 = Pelton
+D = 2               # Define diameter (m) 
+Qdesign = [5, 10, 15]  # Add the design discharge values here
 
-# Define design discharge values
-Qdesign = [5, 10, 15]  # Add your design discharge values here
+conf = len(Qdesign) # Set conf to the size of Qdesign
 
-# Set conf to the size of Qdesign
-conf = len(Qdesign)
-
-# Define diameter (m)
-D = 2       
-
-# Update X array with D and Qdesign values
-X = np.array([D] + Qdesign)
+X = np.array([D] + Qdesign) # Update X array with D and Qdesign values
 
 # Calculate simulation results
 AAE, NPV, BC = Sim_energy(Q, typet, conf, X, global_parameters, turbine_characteristics)
