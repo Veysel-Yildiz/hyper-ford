@@ -42,23 +42,7 @@ import time
 from hyper_py.optimise.opt_energy_functions import Opt_energy
 from hyper_py.optimise.PostProcessor import postplot
 
-# Load the input data set
-streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
-MFD = 0.63  # the minimum environmental flow (m3/s)
 
-# Define discharge after environmental flow
-Q = np.maximum(streamflow - MFD, 0)
-
-# Load the parameters from the JSON file
-with open('global_parameters.json', 'r') as json_file:
-    global_parameters = json.load(json_file)
-
-# Define turbine characteristics and functions in a dictionary
-turbine_characteristics = {
-    2: (global_parameters["mf"], global_parameters["nf"], global_parameters["eff_francis"]),# Francis turbine
-    3: (global_parameters["mp"], global_parameters["np"], global_parameters["eff_pelton"]),# Pelton turbine
-    1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
-}
 
 
 def generate_bounds(numturbine):
@@ -84,33 +68,54 @@ def opt_config(x):
     
     return  Opt_energy (Q, typet, conf, X_in, global_parameters, turbine_characteristics)
 
-# Set the number of turbines for optimization
-numturbine = 2  # Example: optimization up to two turbine configurations
-bounds = generate_bounds(numturbine)
 
-# Start the timer
-start_time = time.time()
+if __name__ == "__main__":
+
+    # Load the input data set
+    streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
+    MFD = 0.63  # the minimum environmental flow (m3/s)
+
+    # Define discharge after environmental flow
+    Q = np.maximum(streamflow - MFD, 0)
+
+    # Load the parameters from the JSON file
+    with open('global_parameters.json', 'r') as json_file:
+        global_parameters = json.load(json_file)
+
+    # Define turbine characteristics and functions in a dictionary
+    turbine_characteristics = {
+        2: (global_parameters["mf"], global_parameters["nf"], global_parameters["eff_francis"]),# Francis turbine
+        3: (global_parameters["mp"], global_parameters["np"], global_parameters["eff_pelton"]),# Pelton turbine
+        1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
+    }
+
+    # Set the number of turbines for optimization
+    numturbine = 2  # Example: optimization up to two turbine configurations
+    bounds = generate_bounds(numturbine)
+
+    # Start the timer
+    start_time = time.time()
 
 
-# Run the differential evolution optimization
-result = differential_evolution(
-    opt_config, 
-    bounds, 
-    maxiter=100, 
-    popsize=1000, 
-    tol=0.001, 
-    mutation=(0.5, 1), 
-    recombination=0.7, 
-    init='latinhypercube'
-)
+    # Run the differential evolution optimization
+    result = differential_evolution(
+        opt_config, 
+        bounds, 
+        maxiter=100, 
+        popsize=1000, 
+        tol=0.001, 
+        mutation=(0.5, 1), 
+        recombination=0.7, 
+        init='latinhypercube'
+    )
 
 
-## post processor, a table displaying the optimization results
-optimization_table = postplot(result)
+    ## post processor, a table displaying the optimization results
+    optimization_table = postplot(result)
 
-# End the timer
-end_time = time.time()
+    # End the timer
+    end_time = time.time()
 
-# Calculate the elapsed time
-elapsed_time = end_time - start_time
-print(f"Elapsed time: {elapsed_time:.2f} seconds")
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time:.2f} seconds")
