@@ -37,7 +37,7 @@ Return :
 import numpy as np
 import json
 
-from sim_energy_functions import Sim_energy
+from hyper_py.simulate.sim_energy_functions import Sim_energy
 
 # Load the input data set
 streamflow = np.loadtxt('input/b_observed.txt', dtype=float, delimiter=',')

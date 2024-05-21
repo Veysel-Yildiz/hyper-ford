@@ -39,8 +39,8 @@ import json
 import time
 
 # Import  the all the functions defined
-from opt_energy_functions import Opt_energy
-from PostProcessor import postplot
+from hyper_py.optimise.opt_energy_functions import Opt_energy
+from hyper_py.optimise.PostProcessor import postplot
 
 # Load the input data set
 streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
