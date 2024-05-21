@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "hyper_py"
+dynamic = ["version"]
+description = "HYdroPowER Simulation and Optimization Toolbox"
+authors = [{name = "Veysel Yildiz", email = "vyildiz1@sheffield.ac.uk"}]
+license = {text = "MIT License"}
+keywords = ["hydropower", "optimization", "simulation", "toolbox"]
+requires-python = ">=3.9"
+readme="README.md"
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas",
+    "matplotlib"
+]
+
+[tool.setuptools.packages]
+find = { }
