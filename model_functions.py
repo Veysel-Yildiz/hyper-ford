@@ -61,7 +61,8 @@ def cost(design_ic, design_h, typet, conf, D, global_parameters):
 
     cost_em = 2.76 * (design_ic/1000)**0.5774 *(design_h)**-0.1193*1.1 * (1 + (conf-1)*(conf-2)*0.03) # in $
 
- return cost_em , np.array([cost_pen]),  cost_ph #tp,
+ #return cost_em , cost_pen,  cost_ph #tp,
+ return np.float64(cost_em), np.float64(cost_pen), np.float64(cost_ph)
 
 ################################################## MOODY ########################
 def moody(ed , Re):

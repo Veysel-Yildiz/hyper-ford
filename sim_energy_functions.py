@@ -129,7 +129,7 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
             SSn[1] = 0
 
         if sum(SSn) < 2:  # turbine type is not appropriate
-          return -999999
+           return -999999
       
         DailyPower = operation_optimization(Q, maxturbine, Qturbine, Q_design, D, kmin, func_Eff, global_parameters)
 

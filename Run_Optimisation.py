@@ -43,7 +43,7 @@ from opt_energy_functions import Opt_energy
 from PostProcessor import postplot
 
 # Load the input data set
-streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
+streamflow = np.loadtxt('input/b_observed.txt', dtype=float, delimiter=',')
 MFD = 0.63  # the minimum environmental flow (m3/s)
 
 # Define discharge after environmental flow
@@ -96,8 +96,8 @@ start_time = time.time()
 result = differential_evolution(
     opt_config, 
     bounds, 
-    maxiter=100, 
-    popsize=1000, 
+    maxiter=10, 
+    popsize=10, 
     tol=0.001, 
     mutation=(0.5, 1), 
     recombination=0.7, 
