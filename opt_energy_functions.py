@@ -41,8 +41,7 @@ import math
 # Import  the all the functions defined
 from model_functions import moody, cost, operation_optimization
 
-
-## SINGLE turbine operation ###################################################
+## turbine operation ###################################################
 
 def Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics):
     

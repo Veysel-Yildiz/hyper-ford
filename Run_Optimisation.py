@@ -37,17 +37,14 @@ from scipy.optimize import  differential_evolution
 import numpy as np
 import json
 import time
+#from numba import jit
 
 # Import  the all the functions defined
 from opt_energy_functions import Opt_energy
+from model_functions import get_sampled_data
 from PostProcessor import postplot
 
-# Load the input data set
-streamflow = np.loadtxt('input/b_observed.txt', dtype=float, delimiter=',')
-MFD = 0.63  # the minimum environmental flow (m3/s)
 
-# Define discharge after environmental flow
-Q = np.maximum(streamflow - MFD, 0)
 
 # Load the parameters from the JSON file
 with open('global_parameters.json', 'r') as json_file:
@@ -84,33 +81,47 @@ def opt_config(x):
     
     return  Opt_energy (Q, typet, conf, X_in, global_parameters, turbine_characteristics)
 
-# Set the number of turbines for optimization
-numturbine = 2  # Example: optimization up to two turbine configurations
-bounds = generate_bounds(numturbine)
+if __name__ == "__main__":
+    
+    
+    # Load the input data set
+    streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
+    MFD = 0.63  # the minimum environmental flow (m3/s)
 
-# Start the timer
-start_time = time.time()
+    sample_size = 100
+    Sampled_streamflow = get_sampled_data(streamflow, sample_size)
+
+    # Define discharge after environmental flow
+    Q = np.maximum(Sampled_streamflow - MFD, 0) 
+    
+    
+   # Set the number of turbines for optimization
+    numturbine = 2  # Example: optimization up to two turbine configurations
+    bounds = generate_bounds(numturbine)
+
+    # Start the timer
+    start_time = time.time()
 
 
-# Run the differential evolution optimization
-result = differential_evolution(
-    opt_config, 
-    bounds, 
-    maxiter=10, 
-    popsize=10, 
-    tol=0.001, 
-    mutation=(0.5, 1), 
-    recombination=0.7, 
-    init='latinhypercube'
-)
+     # Run the differential evolution optimization
+    result = differential_evolution(
+       opt_config, 
+       bounds, 
+       maxiter=5, 
+       popsize=5, 
+       tol=0.001, 
+       mutation=(0.5, 1), 
+       recombination=0.7, 
+       init='latinhypercube'
+       )
 
+ 
+   ## post processor, a table displaying the optimization results
+    optimization_table = postplot(result)
 
-## post processor, a table displaying the optimization results
-optimization_table = postplot(result)
+     # End the timer
+    end_time = time.time()
 
-# End the timer
-end_time = time.time()
-
-# Calculate the elapsed time
-elapsed_time = end_time - start_time
-print(f"Elapsed time: {elapsed_time:.2f} seconds")
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time:.2f} seconds")

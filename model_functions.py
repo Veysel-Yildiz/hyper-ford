@@ -13,6 +13,8 @@ from itertools import combinations
 
 
 ##################################################COST#########################
+
+
 def cost(design_ic, design_h, typet, conf, D, global_parameters):
 
  """ Return:
@@ -65,6 +67,8 @@ def cost(design_ic, design_h, typet, conf, D, global_parameters):
  return np.float64(cost_em), np.float64(cost_pen), np.float64(cost_ph)
 
 ################################################## MOODY ########################
+
+
 def moody(ed , Re):
 
  """ Return f, friction factor
@@ -104,6 +108,7 @@ def moody(ed , Re):
     
 ################################################## operation optimization  #########################
 
+#@jit(nopython=True)
 def inflow_allocation(nr, Od, q_inc, kmin, perc, func_Eff):
      
  """ Return:
@@ -145,6 +150,7 @@ def inflow_allocation(nr, Od, q_inc, kmin, perc, func_Eff):
 
 ################################################## possible combinations #########################
 
+#@jit(nopython=True)
 def generate_patterns(maxturbine):
     # Function to generate the required combinations
     
@@ -305,4 +311,35 @@ def operation_optimization(Q, maxturbine, Qturbine, Q_design, D,  kmin,  func_Ef
 ################################################## possible combinations #########################
 
 
+def get_sampled_data(streamflow, sample_size):
 
+    """ Return sampled data, daily discharge values
+     --------------------------------------
+     Inputs:
+      streamflow : record of streamflow values
+      sample_size : sample size of the data
+
+    """ 
+    # Sort the array in descending order
+    sorted_array = np.sort(streamflow)[::-1]
+    
+    # Ensure sample_size is valid
+    if sample_size < 2:
+        raise ValueError("Sample size should be at least 2")
+    
+    # Ensure sample_size is not greater than array length
+    if sample_size > len(sorted_array):
+        raise ValueError("Sample size should not exceed the length of the array")
+    
+    # Get the index of the maximum and minimum values
+    #max_index = 0
+    #min_index = -1
+    
+    # Get indices for the rest of the sample
+    sample_indices = np.linspace(1, len(sorted_array) - 2, sample_size - 2, dtype=int)
+    
+    # Concatenate max, sample, and min indices
+    indices = np.concatenate(([0], sample_indices, [-1]))
+    
+    # Return subset of the sorted array based on the selected indices
+    return sorted_array[indices]
