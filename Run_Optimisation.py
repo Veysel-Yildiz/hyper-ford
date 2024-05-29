@@ -87,14 +87,22 @@ if __name__ == "__main__":
     # Load the input data set
     streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
     MFD = 0.63  # the minimum environmental flow (m3/s)
-
-    sample_size = 100
-    Sampled_streamflow = get_sampled_data(streamflow, sample_size)
-
-    # Define discharge after environmental flow
-    Q = np.maximum(Sampled_streamflow - MFD, 0) 
     
     
+    # Set this variable to True if you want to sample the streamflow data, False otherwise
+    use_sampling = True
+
+    if use_sampling:
+        sample_size = 100
+        # Get sampled streamflow data
+        Sampled_streamflow = get_sampled_data(streamflow, sample_size)
+        # Define discharge after environmental flow using sampled data
+        Q = np.maximum(Sampled_streamflow - MFD, 0)
+    else:
+        # Define discharge after environmental flow using the entire dataset
+        Q = np.maximum(streamflow - MFD, 0)
+        
+  
    # Set the number of turbines for optimization
     numturbine = 2  # Example: optimization up to two turbine configurations
     bounds = generate_bounds(numturbine)

@@ -36,15 +36,29 @@ Return :
 
 import numpy as np
 import json
+import time
 
 from sim_energy_functions import Sim_energy
+from model_functions import get_sampled_data
+
 
 # Load the input data set
-streamflow = np.loadtxt('input/b_observed.txt', dtype=float, delimiter=',')
+streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
 MFD = 0.63  # the minimum environmental flow (m3/s)
 
-# Define discharge after environmental flow
-Q = np.maximum(streamflow - MFD, 0)
+
+# Set this variable to True if you want to sample the streamflow data, False otherwise
+use_sampling = True
+
+if use_sampling:
+    sample_size = 100
+    # Get sampled streamflow data
+    Sampled_streamflow = get_sampled_data(streamflow, sample_size)
+    # Define discharge after environmental flow using sampled data
+    Q = np.maximum(Sampled_streamflow - MFD, 0)
+else:
+    # Define discharge after environmental flow using the entire dataset
+    Q = np.maximum(streamflow - MFD, 0)
 
 # Load the parameters from the JSON file
 with open('global_parameters.json', 'r') as json_file:
@@ -66,7 +80,17 @@ conf = len(Qdesign) # Set conf to the size of Qdesign
 
 X = np.array([D] + Qdesign) # Update X array with D and Qdesign values
 
+    # Start the timer
+start_time = time.time()
+    
 # Calculate simulation results
 AAE, NPV, BC = Sim_energy(Q, typet, conf, X, global_parameters, turbine_characteristics)
 
 print(f"AAE: {AAE} GWh, NPV: {NPV} million USD, BC: {BC}")
+
+     # End the timer
+end_time = time.time()
+
+    # Calculate the elapsed time
+elapsed_time = end_time - start_time
+print(f"Elapsed time: {elapsed_time:.2f} seconds")

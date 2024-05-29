@@ -39,7 +39,7 @@ import numpy as np
 import math 
 
 # Import  the all the functions defined
-from model_functions import moody, cost, operation_optimization
+from model_functions import moody, cost, operation_optimization, S_operation_optimization
 
 def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
 
@@ -130,8 +130,12 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
 
         if sum(SSn) < 2:  # turbine type is not appropriate
            return -999999
-      
-        DailyPower = operation_optimization(Q, maxturbine, Qturbine, Q_design, D, kmin, func_Eff, global_parameters)
+        
+        size_Q = len(Q)    # the size of time steps
+        if size_Q < 1000:
+          DailyPower = S_operation_optimization(Q, maxturbine, Qturbine, Q_design, D, kmin, func_Eff, global_parameters)
+        else:
+          DailyPower = operation_optimization(Q, maxturbine, Qturbine, Q_design, D, kmin, func_Eff, global_parameters)
 
     AAE = np.mean(DailyPower) * hr / 1e6  # Gwh Calculate average annual energy
 
