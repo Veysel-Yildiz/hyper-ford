@@ -37,9 +37,27 @@ Return :
 import numpy as np
 import json
 import time
+import subprocess
 
 from sim_energy_functions import Sim_energy
 from model_functions import get_sampled_data
+from parameters_check import get_parameter_constraints, validate_parameters
+
+# Make changes directly within the JSON file
+# After making changes, reload the JSON file to get the updated parameters
+subprocess.run(["python", "globalpars_JSON.py"])
+
+# Load the parameters from the JSON file
+with open('global_parameters.json', 'r') as json_file:
+    global_parameters = json.load(json_file)
+
+# Get the parameter constraints
+parameter_constraints = get_parameter_constraints()
+
+# Validate inputs
+validate_parameters(global_parameters, parameter_constraints)
+
+print("All inputs are valid.")
 
 
 # Load the input data set
@@ -60,9 +78,7 @@ else:
     # Define discharge after environmental flow using the entire dataset
     Q = np.maximum(streamflow - MFD, 0)
 
-# Load the parameters from the JSON file
-with open('global_parameters.json', 'r') as json_file:
-    global_parameters = json.load(json_file)
+
 
 # Define turbine characteristics and functions in a dictionary
 turbine_characteristics = {

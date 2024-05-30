@@ -37,18 +37,31 @@ from scipy.optimize import  differential_evolution
 import numpy as np
 import json
 import time
+import subprocess
 #from numba import jit
 
 # Import  the all the functions defined
 from opt_energy_functions import Opt_energy
 from model_functions import get_sampled_data
 from PostProcessor import postplot
+from parameters_check import get_parameter_constraints, validate_parameters
 
-
+# Make changes directly within the JSON file
+# After making changes, reload the JSON file to get the updated parameters
+subprocess.run(["python", "globalpars_JSON.py"])
 
 # Load the parameters from the JSON file
 with open('global_parameters.json', 'r') as json_file:
     global_parameters = json.load(json_file)
+
+# Get the parameter constraints
+parameter_constraints = get_parameter_constraints()
+
+# Validate inputs
+validate_parameters(global_parameters, parameter_constraints)
+
+print("All inputs are valid.")
+
 
 # Define turbine characteristics and functions in a dictionary
 turbine_characteristics = {
@@ -115,8 +128,8 @@ if __name__ == "__main__":
     result = differential_evolution(
        opt_config, 
        bounds, 
-       maxiter=5, 
-       popsize=5, 
+       maxiter=10, 
+       popsize=10, 
        tol=0.001, 
        mutation=(0.5, 1), 
        recombination=0.7, 
