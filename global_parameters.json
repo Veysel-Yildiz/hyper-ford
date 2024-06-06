@@ -1,5 +1,4 @@
 {
-    "maxturbine": 2,
     "operating_scheme": 1,
     "ObjectiveF": 1,
     "case_specific": {
@@ -33,7 +32,6 @@
     "mf": 0.4,
     "mk": 0.2,
     "mp": 0.11,
-    "penalty": 19999990,
     "eff_francis": [
         0,
         0,
