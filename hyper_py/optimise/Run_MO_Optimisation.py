@@ -49,7 +49,7 @@ import matplotlib.pyplot as plt
 # Import  the all the functions defined
 from MO_energy_function import MO_Opt_energy
 from model_functions import get_sampled_data
-from parameters_check import get_parameter_constraints, validate_parameters
+from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
 from PostProcessor import MO_postplot
 
 # Make changes directly within the JSON file
