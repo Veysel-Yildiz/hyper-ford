@@ -47,10 +47,10 @@ from pymoo.visualization.scatter import Scatter
 import matplotlib.pyplot as plt
 
 # Import  the all the functions defined
-from MO_energy_function import MO_Opt_energy
-from model_functions import get_sampled_data
+from hyper_py.optimise.MO_energy_function import MO_Opt_energy
+from hyper_py.model.model_functions import get_sampled_data
 from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
-from PostProcessor import MO_postplot
+from hyper_py.optimise.PostProcessor import MO_postplot
 
 # Make changes directly within the JSON file
 # After making changes, reload the JSON file to get the updated parameters

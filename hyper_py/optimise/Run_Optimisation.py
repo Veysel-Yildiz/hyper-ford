@@ -44,7 +44,7 @@ import subprocess
 from hyper_py.optimise.opt_energy_functions import Opt_energy
 from hyper_py.model.model_functions import get_sampled_data
 from hyper_py.optimise.PostProcessor import postplot
-from parameters_check import get_parameter_constraints, validate_parameters
+from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
 
 # Make changes directly within the JSON file
 # After making changes, reload the JSON file to get the updated parameters
@@ -145,8 +145,8 @@ if __name__ == "__main__":
     }
 
     # Set the number of turbines for optimization
-        numturbine = 2  # Example: optimization up to two turbine configurations
-        bounds = generate_bounds(numturbine)
+    numturbine = 2  # Example: optimization up to two turbine configurations
+    bounds = generate_bounds(numturbine)
 
     # Start the timer
     start_time = time.time()

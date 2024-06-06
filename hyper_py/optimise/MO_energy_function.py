@@ -39,7 +39,7 @@ import numpy as np
 import math 
 
 # Import  the all the functions defined
-from model_functions import moody, cost, operation_optimization, S_operation_optimization
+from hyper_py.model.model_functions import moody, cost, operation_optimization, S_operation_optimization
 
 ## turbine operation ###################################################
 
