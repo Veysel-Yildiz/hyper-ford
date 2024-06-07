@@ -60,9 +60,7 @@ def postplot(result):
  return op_table
 
 
-def MO_postplot(res):
-    X_opt = res.X
-    F_opt = res.F
+def MO_postplot(F_opt, X_opt):
 
     # Extract design parameters
     NPV = abs(F_opt[:, 0])  # Objective Function value

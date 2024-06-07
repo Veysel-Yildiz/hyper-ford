@@ -1,0 +1,93 @@
+THE PENNSYLVANIA STATE UNIVERSITY RESEARCH AND EDUCATIONAL USE LICENSE
+
+BE ADVISED: This Agreement is a legal agreement between "LICENSEE" (defined
+below) and The Pennsylvania State University, a non-profit corporation duly
+organized and existing under the laws of the Commonwealth of Pennsylvania
+("UNIVERSITY").  By installing, downloading, accessing or otherwise using the
+SOFTWARE (defined below), LICENSEE agrees to be bound by the terms of this
+Agreement.  If LICENSEE does not agree with the terms of this Agreement, do
+not install, access, or use the SOFTWARE.
+
+WHEREAS, Dr. Patrick Reed and Dr. David Hadka, employees of The Pennsylvania
+State University, have created and developed certain computer software
+entitled "BORG: Many-Objective Evolutionary Computing Framework" (the
+"SOFTWARE");
+
+WHEREAS, patent protection for the SOFTWARE is being pursued by the UNIVERSITY
+including, but not limited to, United States patent 8,856,054;
+
+WHEREAS, the UNIVERSITY is dedicated to fostering and advancing scientific
+research, this SOFTWARE is made available to the noncommercial research and
+educational community as a public service by the UNIVERSITY.  [Please contact
+the UNIVERSITY Office of Technology Management for information on other
+licensing arrangements (i.e. proprietary commercial applications)].
+
+WHEREAS, the UNIVERSITY is the owner of and has the right to license the
+SOFTWARE and the associated patent rights;
+
+NOW THEREFORE, in consideration of the premises as well as the mutual promises
+and covenants set forth herein and for other good and valuable consideration,
+the receipt and sufficiency of which is hereby acknowledged, the parties
+hereby agree as follows:
+
+1. Definitions
+"LICENSEE" shall mean the person installing the SOFTWARE if it is solely for
+personal use by that person on the personal equipment of that person.  If the
+SOFTWARE is being installed on equipment for use by another legal entity, such
+as a corporation, limited liability company, partnership, or institution, then
+the person installing the SOFTWARE by proceeding with the installation
+certifies that he or she has authority to bind that legal entity to this
+Agreement; and that legal entity shall be considered to be the LICENSEE.
+
+2. Grant and Obligations 
+Under this License Agreement, LICENSEE is granted nonexclusive and
+royalty-free rights to practice any patent rights associated with the
+SOFTWARE, and the SOFTWARE may be used as-is or may be modified, provided
+that your practice or use is solely for noncommercial, research and education
+purposes.  You may not distribute the original version or modifications of the
+SOFTWARE for any purpose.  Both the original version and modified versions of
+the SOFTWARE may be copied and performed provided that the following terms and
+conditions are met:
+ 
+2.1) LICENSEE is affiliated with a nonprofit, noncommercial research and
+educational institution and shall identify the name of the institution and the
+names(s) of the users of the SOFTWARE to UNIVERSITY via Patrick Reed at the
+time that LICENSEE acquires this license;
+
+2.2) Modified versions of the SOFTWARE must clearly state that the work is
+a modification of the SOFTWARE and must prominently display the full SOFTWARE
+title and appropriate copyright notices.  Copyright management information
+(software identifier and version number, copyright notice and license) shall
+be retained in all versions of the SOFTWARE.
+
+2.3) If modified, the source code, documentation, and user run-time
+elements of the SOFTWARE should be clearly labeled by identifying the name of
+the person(s) and/or organization making the modifications, the date of
+modification, and a written description of the modifications.
+
+2.4) The UNIVERSITY may make modifications to the SOFTWARE that are
+substantially similar to modified versions of the SOFTWARE created by others,
+and may make, use, sell, copy, distribute, publicly display, and perform such
+modifications, including making such modifications available under this or
+other licenses, without obligation or restriction.
+
+2.5) Neither the name nor any of the logos of the UNIVERSITY may be used in
+advertising or publicity pertaining to the use or modification of the SOFTWARE
+without the specific, prior written permission of an authorized representative
+of the UNIVERSITY.
+
+2.6) Any publications, reports, course lectures, and/or presentations that
+employ the SOFTWARE or its derivatives will acknowledge the use of the
+SOFTWARE or of any of its derivatives by citing the SOFTWARE developed by
+Dr. Reed and Dr. Hadka.
+
+3. Disclaimer of Warranty 
+THIS SOFTWARE IS MADE AVAILABLE "AS-IS."  THE PENNSYLVANIA STATE UNIVERSITY
+DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, WITH REGARD TO THIS SOFTWARE,
+INCLUDING WITHOUT LIMITATION, THE WARRANTY OF NONINFRINGEMENT AND ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, AND IN NO
+EVENT SHALL THE PENNSYLVANIA STATE UNIVERSITY BE LIABLE FOR ANY DAMAGES
+WHATSOEVER, INCLUDING DIRECT, SPECIAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+RESULTING FROM ANY USE OR PERFORMANCE OF THE SOFTWARE INCLUDING, WITHOUT
+LIMITATION, LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION FOR CONTRACT,
+TORT (INCLUDING NEGLIGENCE) OR STRICT LIABILITY. 

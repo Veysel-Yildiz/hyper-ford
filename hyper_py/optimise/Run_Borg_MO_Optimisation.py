@@ -1,3 +1,4 @@
+
 ## HYPER MO OPTIMISATION 
 """
 ############################################################################
@@ -37,13 +38,9 @@ import numpy as np
 import json
 import subprocess
 import time
-from pymoo.core.problem import Problem
-from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.optimize import minimize
-from pymoo.operators.sampling.lhs import LHS
-from pymoo.operators.crossover.sbx import SBX
-from pymoo.operators.mutation.pm import PM
 import matplotlib.pyplot as plt
+from hyper_py.PyBorg.pyborg  import BorgMOEA
+from platypus import  Problem, Real, NSGAII
 
 # Import  the all the functions defined
 from hyper_py.optimise.MO_energy_function import MO_Opt_energy
@@ -52,32 +49,22 @@ from hyper_py.model.model_functions import get_sampled_data
 from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
 from hyper_py.optimise.PostProcessor import MO_postplot
 
-# Define the problem class
-class MyMultiObjectiveProblem(Problem):
+# Define the  multi-objective optimization problem
+class MyMultiObjectiveProblem:
     def __init__(self, numturbine, Q, global_parameters, turbine_characteristics):
-        super().__init__(n_var=2 + numturbine + 1,
-                         n_obj=2,  # Two objectives
-                         n_constr=0,
-                         xl=np.array([0.51, 0.51, 1] + [0.5] * numturbine),
-                         xu=np.array([3.49, 3.49, 5] + [20.0] * numturbine))
         self.numturbine = numturbine
         self.Q = Q
         self.global_parameters = global_parameters
         self.turbine_characteristics = turbine_characteristics
 
-    def _evaluate(self, x, out, *args, **kwargs):
-        typet = np.round(x[:, 0]).astype(int)  # Turbine type
-        conf = np.round(x[:, 1]).astype(int)  # Turbine configuration
-        X_in = x[:, 2:2 + self.numturbine + 1]
+    def evaluate(self, x):
+        typet = np.round(x[0]).astype(int)  # Turbine type
+        conf = np.round(x[1]).astype(int)  # Turbine configuration
+        X_in = x[2:2 + self.numturbine + 1]
         
-        F1 = np.zeros(len(x))
-        F2 = np.zeros(len(x))
-        
-        for i in range(len(x)):
-            objectives = MO_Opt_energy(self.Q, typet[i], conf[i], X_in[i], self.global_parameters, self.turbine_characteristics)
-            F1[i], F2[i] = objectives
-        
-        out["F"] = np.column_stack([F1, F2])
+        # Assume MO_Opt_energy is a function that returns the objectives
+        objectives = MO_Opt_energy(self.Q, typet, conf, X_in, self.global_parameters, self.turbine_characteristics)
+        return objectives
 
 
 if __name__ == "__main__":
@@ -113,7 +100,7 @@ if __name__ == "__main__":
     use_sampling = True
 
     if use_sampling:
-        sample_size = 50
+        sample_size = 100
         # Get sampled streamflow data
         Sampled_streamflow = get_sampled_data(streamflow, sample_size)
         # Define discharge after environmental flow using sampled data
@@ -124,28 +111,25 @@ if __name__ == "__main__":
         
     # Set the number of turbines for optimization
     numturbine = 2  # Example: optimization up to two turbine configurations
+    
+    problem_definition = MyMultiObjectiveProblem(numturbine, Q, global_parameters, turbine_characteristics)
 
-    # Create the problem instance
-    problem = MyMultiObjectiveProblem(numturbine, Q, global_parameters, turbine_characteristics)
-
-    # Define the algorithm
-    algorithm = NSGA2(
-        pop_size=5,
-        sampling=LHS(),
-        crossover=SBX(prob=0.9, eta=15),
-        mutation=PM(eta=20),
-        eliminate_duplicates=True
-    )
+    # Define the Platypus problem
+    problem = Problem(2 + numturbine + 1, 2)
+    problem.types[:2] = [Real(0.51, 3.49), Real(0.51, 3.49)]
+    problem.types[2:] = [Real(1, 5)] + [Real(0.5, 20.0)] * numturbine
+    problem.function = problem_definition.evaluate
 
     # Start the timer
     start_time = time.time()
-
-    # Perform the optimization
-    res = minimize(problem,
-                   algorithm,
-                   ('n_gen', 50),
-                   seed=1,
-                   verbose=True)
+    
+    # Use the NSGA-II algorithm to solve the problem
+    #algorithm = NSGAII(problem)
+    
+   # define and run the Borg algorithm for 10000 evaluations
+    algorithm = BorgMOEA(problem, epsilons=0.001)
+    
+    algorithm.run(1000)
 
     # End the timer
     end_time = time.time()
@@ -154,18 +138,22 @@ if __name__ == "__main__":
     elapsed_time = end_time - start_time
     print(f"Elapsed time: {elapsed_time:.2f} seconds")
 
-    # Plot the results
-    #Scatter().add(res.F).show()
-   
 
-    ## post processor, a table displaying the optimization results
-    optimization_table = MO_postplot(res.F, res.X)
-     
-     
-   # Plot the results
-    plt.scatter(-1 * res.F[:, 0], -1 * res.F[:, 1])
+    # Print the results
+    for solution in algorithm.result:
+       print(solution.objectives)
+    
+
+    objectives = np.array([solution.objectives for solution in algorithm.result])
+    X_opt = np.array([solution.variables for solution in algorithm.result])
+    
+    # Plot the results
+    plt.scatter(-1 *objectives[:, 0], -1 *objectives[:, 1])
     plt.xlabel("NPV (Million USD)")
     plt.ylabel("BC (-)")
+    plt.title("Optimization Results")
     plt.show()
+
     
-    
+    ## post processor, a table displaying the optimization results
+    optimization_table = MO_postplot(objectives, X_opt)
