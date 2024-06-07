@@ -47,35 +47,10 @@ from pymoo.visualization.scatter import Scatter
 import matplotlib.pyplot as plt
 
 # Import  the all the functions defined
-from MO_energy_function import MO_Opt_energy
-from model_functions import get_sampled_data
-from parameters_check import get_parameter_constraints, validate_parameters
-from PostProcessor import MO_postplot
-
-# Make changes directly within the JSON file
-# After making changes, reload the JSON file to get the updated parameters
-subprocess.run(["python", "globalpars_JSON.py"])
-
-# Load the parameters from the JSON file
-with open('global_parameters.json', 'r') as json_file:
-    global_parameters = json.load(json_file)
-
-# Get the parameter constraints
-parameter_constraints = get_parameter_constraints()
-
-# Validate inputs
-validate_parameters(global_parameters, parameter_constraints)
-
-print("All inputs are valid.")
-
-
-# Define turbine characteristics and functions in a dictionary
-turbine_characteristics = {
-    2: (global_parameters["mf"], global_parameters["nf"], global_parameters["eff_francis"]),# Francis turbine
-    3: (global_parameters["mp"], global_parameters["np"], global_parameters["eff_pelton"]),# Pelton turbine
-    1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
-}
-
+from hyper_py.optimise.MO_energy_function import MO_Opt_energy
+from hyper_py.model.model_functions import get_sampled_data
+from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
+from hyper_py.optimise.PostProcessor import MO_postplot
 
 # Define the problem class
 class MyMultiObjectiveProblem(Problem):
@@ -104,8 +79,32 @@ class MyMultiObjectiveProblem(Problem):
         
         out["F"] = np.column_stack([F1, F2])
 
+
 if __name__ == "__main__":
     
+    # Make changes directly within the JSON file
+    # After making changes, reload the JSON file to get the updated parameters
+    subprocess.run(["python", "globalpars_JSON.py"])
+
+    # Load the parameters from the JSON file
+    with open('global_parameters.json', 'r') as json_file:
+        global_parameters = json.load(json_file)
+
+    # Get the parameter constraints
+    parameter_constraints = get_parameter_constraints()
+
+    # Validate inputs
+    validate_parameters(global_parameters, parameter_constraints)
+
+    print("All inputs are valid.")
+
+
+    # Define turbine characteristics and functions in a dictionary
+    turbine_characteristics = {
+        2: (global_parameters["mf"], global_parameters["nf"], global_parameters["eff_francis"]),# Francis turbine
+        3: (global_parameters["mp"], global_parameters["np"], global_parameters["eff_pelton"]),# Pelton turbine
+        1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
+    }
     # Load the input data set
     streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
     MFD = 0.63  # the minimum environmental flow (m3/s)

@@ -39,15 +39,21 @@ import json
 import time
 import subprocess
 
-from sim_energy_functions import Sim_energy
-from model_functions import get_sampled_data
-from parameters_check import get_parameter_constraints, validate_parameters
+from hyper_py.simulate.sim_energy_functions import Sim_energy
+from hyper_py.model.model_functions import get_sampled_data
+from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
 
 # Make changes directly within the JSON file
 # After making changes, reload the JSON file to get the updated parameters
 subprocess.run(["python", "globalpars_JSON.py"])
+# Load the input data set
+streamflow = np.loadtxt('input/b_observed.txt', dtype=float, delimiter=',')
+MFD = 0.63  # the minimum environmental flow (m3/s)
 
-# Load the parameters from the JSON file
+# Define discharge after environmental flow
+Q = np.maximum(streamflow - MFD, 0)
+
+    # Load the parameters from the JSON file
 with open('global_parameters.json', 'r') as json_file:
     global_parameters = json.load(json_file)
 
@@ -87,7 +93,7 @@ turbine_characteristics = {
     1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
 }
 
-# Setup the model
+    # Setup the model
 typet = 2           # turbine type: 1 = Kaplan, 2 = Francis, 3 = Pelton
 D = 2               # Define diameter (m) 
 Qdesign = [5, 10, 15]  # Add the design discharge values here

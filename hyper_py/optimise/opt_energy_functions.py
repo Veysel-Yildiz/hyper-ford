@@ -1,4 +1,4 @@
-## HYPER SIMULATION 
+## HYPER OPTIMIZATION 
 """
 ############################################################################
 #                     Written by Veysel Yildiz                             #
@@ -7,9 +7,8 @@
 ############################################################################
 """
 """  Return :
-         AAE: Annual average energy
-        NPV : Net Present Value in million USD
-        BC  : Benefit to Cost Ratio
+         OF : Objective function, Net Present Value (million USD) or  Benefot to Cost Ratio (-)
+          X : Optimal design parameters
 --------------------------------------
     Inputs :
 
@@ -24,7 +23,8 @@ global_parameters : structure of global variables
                ir : the investment discount rate (or interest rate)
                 N : life time of the project (years)
  operating_scheme : turbine configuration setup 1 = 1 small + identical, 2 = all identical, 3 = all varied
-    
+       ObjectiveF : the objective function to be maximized  1: NPV, 2: BC
+       
 Q : daily flow
 typet : turbine type
 conf : turbine configuration; single, dual, triple
@@ -39,12 +39,15 @@ import numpy as np
 import math 
 
 # Import  the all the functions defined
-from model_functions import moody, cost, operation_optimization, S_operation_optimization
+from hyper_py.model.model_functions import moody, cost, operation_optimization, S_operation_optimization
 
-def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
+## turbine operation ###################################################
 
+def Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics):
+    
     # Extract parameters
     operating_scheme = global_parameters["operating_scheme"]
+    ObjectiveF = global_parameters["ObjectiveF"]
     case_specific = global_parameters["case_specific"]
     hg,  L, cf, om, fxc, ep, pt, ir, N = case_specific.values()
     e, hr, perc = global_parameters["e"], global_parameters["hr"], global_parameters["perc"]
@@ -52,6 +55,8 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
     # Calculate derived parameters
     CRF = ir * (1 + ir)**N / ((1 + ir)**N - 1) #capital recovery factor
     tf = 1 / (1 + ir)**25 # 25 year of discount for electro-mechanic parts
+    
+    penalty = 19999990
     
     # Unpack the parameter values
     D = X[0]  # Diameter
@@ -65,6 +70,10 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
         
         # Calculate flow velocity and Reynolds number for design head
         V_d = 4 * Q_design / (np.pi * D**2)
+
+        if V_d > 9 or V_d < 2.5:
+           return penalty * V_d
+ 
         Re_d = V_d * D / 1e-6  # Kinematic viscosity ν = 1,002 · 10−6 m2∕s
         
         # Find the friction factor [-] for design head
@@ -80,8 +89,8 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
         ss_S = 214 / 60 * math.sqrt(Q_design) / (9.81 * design_h)**0.75
         
         if var_name_cavitation[1] <= ss_S or ss_L <= var_name_cavitation[0]:
-            return -999999  # turbine type is not appropriate return
-        
+            return penalty * V_d  # turbine type is not appropriate return
+
         # Calculate power
         q = np.minimum(Q, Q_design)  # Calculate q as the minimum of Q and Q_design
         n = np.interp(q / Q_design, perc, func_Eff)  # Interpolate values from func_Eff based on qt/Q_design ratio
@@ -91,6 +100,7 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
         Re = V * D / 1e-6  # Reynolds number
         f = moody(ed, Re)  # Friction factor
         hnet = hg - f * (L / D) * V**2 / (19.62 * 1.1)  # Head loss due to friction
+        
         DailyPower = hnet * q * 9.81 * n * 0.98  # Power
         
     else:  # Dual and Triple turbine operation; operation optimization
@@ -109,6 +119,10 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
      
         Q_design = np.sum(Qturbine)  # Design discharge
         V_d = 4 * Q_design / (np.pi * D**2)  # Flow velocity for design head
+        
+        if V_d > 9 or V_d < 2.5:
+            return penalty * V_d
+ 
         Re_d = V_d * D / 1e-6  # Reynolds number for design head
         f_d = moody(ed, np.array([Re_d]))  # Friction factor for design head
         hf_d = f_d * (L / D) * V_d**2 / (2 * 9.81) * 1.1  # Head losses for design head
@@ -120,17 +134,16 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
         ss_S1 = 214 / 60 * math.sqrt(Qturbine[0]) / (9.81 * design_h)**0.75
         ss_L2 = 3000 / 60 * math.sqrt(Qturbine[1]) / (9.81 * design_h)**0.75
         ss_S2 = 214 / 60 * math.sqrt(Qturbine[1]) / (9.81 * design_h)**0.75
-
+        
         SSn = [1, 1]
         if var_name_cavitation[1] <= ss_S1 or ss_L1 <= var_name_cavitation[0]:
-            SSn[0] = 0
-
+          SSn[0] = 0
         if var_name_cavitation[1] <= ss_S2 or ss_L2 <= var_name_cavitation[0]:
-            SSn[1] = 0
+          SSn[1] = 0
 
         if sum(SSn) < 2:  # turbine type is not appropriate
-           return -999999
-        
+           return penalty * V_d 
+ 
         size_Q = len(Q)    # the size of time steps
         if size_Q < 1000:
           DailyPower = S_operation_optimization(Q, maxturbine, Qturbine, Q_design, D, kmin, func_Eff, global_parameters)
@@ -156,13 +169,13 @@ def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
 
     AC = CRF * T_cost + cost_OP  # Annual cost in M dollars
 
-    NPV = (AR - AC) / CRF
+    if ObjectiveF == 1:
+        OF = (AR - AC) / CRF
+     
+    elif ObjectiveF == 2:
+        OF = AR / AC
 
-    BC = AR / AC
+    return -OF 
 
-    return AAE, NPV, BC
-        
-        
-    
-
+##
 
