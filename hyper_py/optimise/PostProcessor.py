@@ -9,6 +9,8 @@
 op_table: optimization table constructed with the optimization result parameters,
  including the objective function value, turbine type, turbine configuration, 
  penstock diameter, and turbine design discharges. 
+ 
+Scatter Plot: Pareto Front of design alternatives 
 --------------------------------------
   Inputs:
 
@@ -18,6 +20,8 @@ op_table: optimization table constructed with the optimization result parameters
 # Import  the modules to be used from Library
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
  
 def postplot(result): 
 
@@ -98,4 +102,18 @@ def MO_postplot(F_opt, X_opt):
 
     return op_table
     
+
+def MO_scatterplot(F1, F2):
+
+    plt.scatter(-1 * F1, -1 * F2, color='blue')
+    plt.xlabel("NPV (Million USD)", fontsize=15)
+    plt.ylabel("BC (-)", fontsize=16)
+    plt.title("Optimization Results", fontsize=15)
+    plt.tick_params(axis='both', which='major', labelsize=12, width=2)
+    plt.show()
+
+
+
+
+
 

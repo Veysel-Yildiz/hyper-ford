@@ -43,14 +43,13 @@ from pymoo.optimize import minimize
 from pymoo.operators.sampling.lhs import LHS
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
-import matplotlib.pyplot as plt
 
 # Import  the all the functions defined
 from hyper_py.optimise.MO_energy_function import MO_Opt_energy
 from hyper_py.model.model_functions import get_sampled_data
 
 from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
-from hyper_py.optimise.PostProcessor import MO_postplot
+from hyper_py.optimise.PostProcessor import MO_postplot, MO_scatterplot
 
 # Define the problem class
 class MyMultiObjectiveProblem(Problem):
@@ -113,7 +112,7 @@ if __name__ == "__main__":
     use_sampling = True
 
     if use_sampling:
-        sample_size = 50
+        sample_size = 100
         # Get sampled streamflow data
         Sampled_streamflow = get_sampled_data(streamflow, sample_size)
         # Define discharge after environmental flow using sampled data
@@ -123,14 +122,14 @@ if __name__ == "__main__":
         Q = np.maximum(streamflow - MFD, 0)
         
     # Set the number of turbines for optimization
-    numturbine = 2  # Example: optimization up to two turbine configurations
+    numturbine = 3  # Example: optimization up to two turbine configurations
 
     # Create the problem instance
     problem = MyMultiObjectiveProblem(numturbine, Q, global_parameters, turbine_characteristics)
 
     # Define the algorithm
     algorithm = NSGA2(
-        pop_size=5,
+        pop_size=50,
         sampling=LHS(),
         crossover=SBX(prob=0.9, eta=15),
         mutation=PM(eta=20),
@@ -143,7 +142,7 @@ if __name__ == "__main__":
     # Perform the optimization
     res = minimize(problem,
                    algorithm,
-                   ('n_gen', 50),
+                   ('n_gen', 200),
                    seed=1,
                    verbose=True)
 
@@ -161,11 +160,8 @@ if __name__ == "__main__":
     ## post processor, a table displaying the optimization results
     optimization_table = MO_postplot(res.F, res.X)
      
+    # Plot the results: Pareto Front
+    MO_scatterplot(res.F[:, 0], res.F[:, 1])
      
-   # Plot the results
-    plt.scatter(-1 * res.F[:, 0], -1 * res.F[:, 1])
-    plt.xlabel("NPV (Million USD)")
-    plt.ylabel("BC (-)")
-    plt.show()
-    
+
     

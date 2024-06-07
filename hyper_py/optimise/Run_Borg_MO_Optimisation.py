@@ -1,5 +1,5 @@
 
-## HYPER MO OPTIMISATION 
+## HYPER BORG MO OPTIMISATION 
 """
 ############################################################################
 #                     Written by Veysel Yildiz                             #
@@ -38,16 +38,16 @@ import numpy as np
 import json
 import subprocess
 import time
-import matplotlib.pyplot as plt
 from hyper_py.PyBorg.pyborg  import BorgMOEA
-from platypus import  Problem, Real, NSGAII
+from platypus import  Problem, Real
+#from platypus import  Problem, Real, NSGAII
 
 # Import  the all the functions defined
 from hyper_py.optimise.MO_energy_function import MO_Opt_energy
 from hyper_py.model.model_functions import get_sampled_data
 
 from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
-from hyper_py.optimise.PostProcessor import MO_postplot
+from hyper_py.optimise.PostProcessor import MO_postplot, MO_scatterplot
 
 # Define the  multi-objective optimization problem
 class MyMultiObjectiveProblem:
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         Q = np.maximum(streamflow - MFD, 0)
         
     # Set the number of turbines for optimization
-    numturbine = 2  # Example: optimization up to two turbine configurations
+    numturbine = 3  # Example: optimization up to two turbine configurations
     
     problem_definition = MyMultiObjectiveProblem(numturbine, Q, global_parameters, turbine_characteristics)
 
@@ -128,8 +128,7 @@ if __name__ == "__main__":
     
    # define and run the Borg algorithm for 10000 evaluations
     algorithm = BorgMOEA(problem, epsilons=0.001)
-    
-    algorithm.run(1000)
+    algorithm.run(10000)
 
     # End the timer
     end_time = time.time()
@@ -143,17 +142,18 @@ if __name__ == "__main__":
     for solution in algorithm.result:
        print(solution.objectives)
     
-
+    # extract the solutions
     objectives = np.array([solution.objectives for solution in algorithm.result])
     X_opt = np.array([solution.variables for solution in algorithm.result])
     
-    # Plot the results
-    plt.scatter(-1 *objectives[:, 0], -1 *objectives[:, 1])
-    plt.xlabel("NPV (Million USD)")
-    plt.ylabel("BC (-)")
-    plt.title("Optimization Results")
-    plt.show()
 
-    
     ## post processor, a table displaying the optimization results
     optimization_table = MO_postplot(objectives, X_opt)
+    
+    
+    # Plot the results: Pareto Front
+    MO_scatterplot(objectives[:, 0], objectives[:, 1])
+    
+
+    
+    
