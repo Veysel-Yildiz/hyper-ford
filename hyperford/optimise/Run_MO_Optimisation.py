@@ -46,11 +46,11 @@ from pymoo.operators.mutation.pm import PM
 import matplotlib.pyplot as plt
 
 # Import  the all the functions defined
-from hyper_py.optimise.MO_energy_function import MO_Opt_energy
-from hyper_py.model.model_functions import get_sampled_data
+from hyperford.optimise.MO_energy_function import MO_Opt_energy
+from hyperford.model.model_functions import get_sampled_data
 
-from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
-from hyper_py.optimise.PostProcessor import MO_postplot
+from hyperford.utils.parameters_check import get_parameter_constraints, validate_parameters
+from hyperford.optimise.PostProcessor import MO_postplot
 
 # Define the problem class
 class MyMultiObjectiveProblem(Problem):

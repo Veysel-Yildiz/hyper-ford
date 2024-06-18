@@ -41,10 +41,10 @@ import subprocess
 #from numba import jit
 
 # Import  the all the functions defined
-from hyper_py.optimise.opt_energy_functions import Opt_energy
-from hyper_py.model.model_functions import get_sampled_data
-from hyper_py.optimise.PostProcessor import postplot
-from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
+from hyperford.optimise.opt_energy_functions import Opt_energy
+from hyperford.model.model_functions import get_sampled_data
+from hyperford.optimise.PostProcessor import postplot
+from hyperford.utils.parameters_check import get_parameter_constraints, validate_parameters
 
 
 def generate_bounds(numturbine):

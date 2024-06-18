@@ -39,14 +39,15 @@ import numpy as np
 import math 
 
 # Import  the all the functions defined
-from hyper_py.model.model_functions import moody, cost, operation_optimization, S_operation_optimization
+from hyperford.model.model_functions import moody, cost, operation_optimization, S_operation_optimization
 
 ## turbine operation ###################################################
 
-def MO_Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics):
+def Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics):
     
     # Extract parameters
     operating_scheme = global_parameters["operating_scheme"]
+    ObjectiveF = global_parameters["ObjectiveF"]
     case_specific = global_parameters["case_specific"]
     hg,  L, cf, om, fxc, ep, pt, ir, N = case_specific.values()
     e, hr, perc = global_parameters["e"], global_parameters["hr"], global_parameters["perc"]
@@ -71,7 +72,7 @@ def MO_Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics
         V_d = 4 * Q_design / (np.pi * D**2)
 
         if V_d > 9 or V_d < 2.5:
-           return penalty * V_d, penalty * V_d
+           return penalty * V_d
  
         Re_d = V_d * D / 1e-6  # Kinematic viscosity ν = 1,002 · 10−6 m2∕s
         
@@ -88,7 +89,7 @@ def MO_Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics
         ss_S = 214 / 60 * math.sqrt(Q_design) / (9.81 * design_h)**0.75
         
         if var_name_cavitation[1] <= ss_S or ss_L <= var_name_cavitation[0]:
-            return penalty * V_d, penalty * V_d  # turbine type is not appropriate return
+            return penalty * V_d  # turbine type is not appropriate return
 
         # Calculate power
         q = np.minimum(Q, Q_design)  # Calculate q as the minimum of Q and Q_design
@@ -120,7 +121,7 @@ def MO_Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics
         V_d = 4 * Q_design / (np.pi * D**2)  # Flow velocity for design head
         
         if V_d > 9 or V_d < 2.5:
-            return penalty * V_d, penalty * V_d
+            return penalty * V_d
  
         Re_d = V_d * D / 1e-6  # Reynolds number for design head
         f_d = moody(ed, np.array([Re_d]))  # Friction factor for design head
@@ -141,7 +142,7 @@ def MO_Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics
           SSn[1] = 0
 
         if sum(SSn) < 2:  # turbine type is not appropriate
-           return penalty * V_d, penalty * V_d
+           return penalty * V_d 
  
         size_Q = len(Q)    # the size of time steps
         if size_Q < 1000:
@@ -168,11 +169,13 @@ def MO_Opt_energy (Q, typet, conf, X, global_parameters, turbine_characteristics
 
     AC = CRF * T_cost + cost_OP  # Annual cost in M dollars
 
-    OF1 = (AR - AC) / CRF # NPV
+    if ObjectiveF == 1:
+        OF = (AR - AC) / CRF
      
-    OF2 = AR / AC # BC
+    elif ObjectiveF == 2:
+        OF = AR / AC
 
-    return -OF1, -OF2 
+    return -OF 
 
 ##
 
