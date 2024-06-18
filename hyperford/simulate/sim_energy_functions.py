@@ -39,7 +39,7 @@ import numpy as np
 import math 
 
 # Import  the all the functions defined
-from hyper_py.model.model_functions import moody, cost, operation_optimization, S_operation_optimization
+from hyperford.model.model_functions import moody, cost, operation_optimization, S_operation_optimization
 
 def Sim_energy (Q, typet, conf, X, global_parameters,turbine_characteristics):
 
