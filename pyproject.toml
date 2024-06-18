@@ -2,7 +2,7 @@
 requires = ["setuptools"]
 
 [project]
-name = "hyperford"
+name = "hyper-ford"
 dynamic = ["version"]
 description = "HYdroPowER Simulation and Optimization Toolbox"
 authors = [{name = "Veysel Yildiz", email = "vyildiz1@sheffield.ac.uk"}]
