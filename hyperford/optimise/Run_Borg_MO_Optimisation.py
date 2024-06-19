@@ -51,13 +51,13 @@ from platypus import  Problem, Real, NSGAII
 from hyperford.optimise.MO_energy_function import MO_Opt_energy
 from hyperford.model.model_functions import get_sampled_data
 
-<<<<<<< HEAD:hyper_py/optimise/Run_Borg_MO_Optimisation.py
+
 from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
 from hyper_py.optimise.PostProcessor import MO_postplot, MO_scatterplot
-=======
+
 from hyperford.utils.parameters_check import get_parameter_constraints, validate_parameters
 from hyperford.optimise.PostProcessor import MO_postplot
->>>>>>> b3f339391456db3f419cf13c050a26dbefa4b7f6:hyperford/optimise/Run_Borg_MO_Optimisation.py
+
 
 # Define the  multi-objective optimization problem
 class MyMultiObjectiveProblem:
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     
    # define and run the Borg algorithm for 10000 evaluations
     algorithm = BorgMOEA(problem, epsilons=0.001)
-    algorithm.run(10000)
+    algorithm.run(100)
 
     # End the timer
     end_time = time.time()
