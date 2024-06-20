@@ -14,7 +14,9 @@ dependencies = [
     "numpy",
     "scipy",
     "pandas",
-    "matplotlib"
+    "matplotlib",
+    "platypus-opt",
+    "pymoo"  
 ]
 
 [tool.setuptools.packages]
