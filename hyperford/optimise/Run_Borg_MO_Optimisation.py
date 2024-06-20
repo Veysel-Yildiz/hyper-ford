@@ -39,11 +39,8 @@ import json
 import subprocess
 import time
 
-from hyper_py.PyBorg.pyborg  import BorgMOEA
-from platypus import  Problem, Real
-#from platypus import  Problem, Real, NSGAII
 
-import matplotlib.pyplot as plt
+
 from hyperford.PyBorg.pyborg  import BorgMOEA
 from platypus import  Problem, Real, NSGAII
 
@@ -52,11 +49,8 @@ from hyperford.optimise.MO_energy_function import MO_Opt_energy
 from hyperford.model.model_functions import get_sampled_data
 
 
-from hyper_py.utils.parameters_check import get_parameter_constraints, validate_parameters
-from hyper_py.optimise.PostProcessor import MO_postplot, MO_scatterplot
-
 from hyperford.utils.parameters_check import get_parameter_constraints, validate_parameters
-from hyperford.optimise.PostProcessor import MO_postplot
+from hyperford.optimise.PostProcessor import MO_postplot, MO_scatterplot
 
 
 # Define the  multi-objective optimization problem
@@ -138,7 +132,7 @@ if __name__ == "__main__":
     
    # define and run the Borg algorithm for 10000 evaluations
     algorithm = BorgMOEA(problem, epsilons=0.001)
-    algorithm.run(100)
+    algorithm.run(1000)
 
     # End the timer
     end_time = time.time()
