@@ -37,7 +37,7 @@ from scipy.optimize import  differential_evolution
 import numpy as np
 import json
 import time
-import subprocess
+
 #from numba import jit
 
 # Import  the all the functions defined
@@ -94,9 +94,6 @@ if __name__ == "__main__":
   
    
 if __name__ == "__main__":
-    # Make changes directly within the JSON file
-    # After making changes, reload the JSON file to get the updated parameters
-    subprocess.run(["python", "globalpars_JSON.py"])
 
     # Load the input data set
     streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')

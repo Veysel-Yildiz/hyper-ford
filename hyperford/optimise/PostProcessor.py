@@ -21,6 +21,7 @@ Scatter Plot: Pareto Front of design alternatives
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from tabulate import tabulate  # Import tabulate
 
  
 def postplot(result): 
@@ -86,8 +87,8 @@ def MO_postplot(F_opt, X_opt):
 
     # Create a dictionary for the table
     data = {
-        'NPV': NPV,
-        'BC': BC,
+        'NPV (M USD)': NPV,
+        'BC (-)': BC,
         'Turbine Type': turbine_type,
         'Turbine Config': turbine_config,
         'Diameter (m)': diameter
@@ -114,6 +115,9 @@ def MO_scatterplot(F1, F2):
 
 
 
-
+def create_table(optimization_table, filename="optimization_results.txt"):
+    """Save the optimization results to a formatted text file."""
+    with open(filename, 'w') as f:
+        f.write(tabulate(optimization_table, headers='keys', tablefmt='grid'))
 
 

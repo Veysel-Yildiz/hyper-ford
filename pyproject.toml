@@ -21,3 +21,8 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+# Add the scripts section here
+[project.scripts]
+run-MO-opt = "hyperford.optimise.Run_Borg_main:main"
+run-SO-opt = "hyperford.optimise.Run_SingleDE_main:main"

@@ -36,13 +36,13 @@ X(1), typet :  Turbine type (1= Kaplan, 2= Francis, 3 = Pelton turbine)
 # Import  the modules to be used from Library
 import numpy as np
 import json
-import subprocess
 import time
 
 
 
 from hyperford.PyBorg.pyborg  import BorgMOEA
 from platypus import  Problem, Real, NSGAII
+
 
 # Import  the all the functions defined
 from hyperford.optimise.MO_energy_function import MO_Opt_energy
@@ -73,9 +73,6 @@ class MyMultiObjectiveProblem:
 
 if __name__ == "__main__":
     
-    # Make changes directly within the JSON file
-    # After making changes, reload the JSON file to get the updated parameters
-    subprocess.run(["python", "globalpars_JSON.py"])
 
     # Load the parameters from the JSON file
     with open('global_parameters.json', 'r') as json_file:
@@ -132,7 +129,7 @@ if __name__ == "__main__":
     
    # define and run the Borg algorithm for 10000 evaluations
     algorithm = BorgMOEA(problem, epsilons=0.001)
-    algorithm.run(1000)
+    algorithm.run(2000)
 
     # End the timer
     end_time = time.time()
