@@ -16,7 +16,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "platypus-opt,
-    "pymoo"  
+    "pymoo"
 ]
 
 [tool.setuptools.packages]
