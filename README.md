@@ -35,31 +35,44 @@ opt_energy_functions.py: Includes functions for daily power production and objec
 
 ## Getting Started
 
-Load Input Data: Ensure you have the necessary input data files, such as b_observed.txt, containing river flow records.
+### Prerequisites
 
-Global Parameters: Modify the global_parameters.json file to suit your specific project requirements.
+1. **Project Folder:** Create a project folder on your desktop.
+   - Example: `HYPER_Project`
+   
+2. **Input Data:** Inside the project folder, create a subfolder named `input` and place the necessary input data files there.
+   - Example: `HYPER_Project/input/b_observed.txt` (containing river flow records)
 
-Run Simulation: Use Run_Simulation.py to simulate energy production based on predefined design parameters.
+3. **Global Parameters:** Modify the `global_parameters.json` file to suit your specific project requirements.
 
-Run Optimization: Use Run_Optimisation.py to find the optimal design for your RoR hydropower plant.
+### Installation
+
+To install the HYPER package:
+
+1. Navigate to the project directory in your command line interface.
+2. Create a virtual environment:
+   - Windows: `py -m venv .venv`
+   - macOS / Linux: `python3 -m venv .venv`
+3. Activate the virtual environment:
+   - Windows: `.venv\Scripts\activate`
+   - macOS / Linux: `source .venv/bin/activate`
+4. Install the package:
+   - `py -m pip install .`
+   - For editable install: `py -m pip install -e .`
 
 ## Usage
 
-To run a simulation: python Run_Simulation.py
+Single Objective Optimization
+To run a single objective optimization from the command line:
 
-To run an optimization:python Run_Optimisation.py
+''run-SO-opt''
 
-## Install as package
+Multi Objective Optimization
+To run a multi-objective optimization from the command line:
 
-To install the project as a python package:
-1. Download project from Github
-2. Navigate to Project directory with command line interface
-3. Create a new venv `py -m venv .venv`
-4. Activate environment
-    1. Windows: `.venv\Scripts\activate`
-    2. macOS / Linux: `source .venv/Scripts/activate`
-5. Install package: `py -m pip install .`
-    1. If you are developing on the package you may wish to do an editable install: `py -m pip install -e .`
+''run-SO-opt''
+
+If you are developing on the package you may wish to do an editable install: `py -m pip install -e .`
 
 
 ## License
