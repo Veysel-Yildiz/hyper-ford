@@ -64,13 +64,11 @@ To install the HYPER package:
 
 Single Objective Optimization
 To run a single objective optimization from the command line:
-
-''run-SO-opt''
+ `run-SO-opt`
 
 Multi Objective Optimization
 To run a multi-objective optimization from the command line:
-
-''run-SO-opt''
+`run-MO-opt`
 
 If you are developing on the package you may wish to do an editable install: `py -m pip install -e .`
 
