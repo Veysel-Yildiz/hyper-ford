@@ -12,10 +12,10 @@ requires-python = ">=3.9"
 readme = "README.md"
 dependencies = [
     "numpy",
+    "platypus-opt",
     "scipy",
     "pandas",
     "matplotlib",
-    "platypus-opt",
     "pymoo"
 ]
 
