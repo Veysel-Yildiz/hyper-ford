@@ -68,7 +68,7 @@ To run a single objective optimization from the command line:
 
 Multi Objective Optimization
 To run a multi-objective optimization from the command line:
-`run-MO-opt`
+./run-MO-opt.sh
 
 If you are developing on the package you may wish to do an editable install: `py -m pip install -e .`
 
