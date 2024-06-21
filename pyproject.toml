@@ -19,5 +19,5 @@ dependencies = [
     "pymoo"
 ]
 
-[tool.setuptools.packages]
-find = { }
+[tool.setuptools.packages.find]
+where = ["."]
