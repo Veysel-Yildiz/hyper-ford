@@ -67,8 +67,10 @@ def main():
     except FileNotFoundError as e:
         logging.error(f"Error loading streamflow data: {e}")
         return
+    
+    case_specific = global_parameters["case_specific"]
+    MFD = global_parameters["MFD"] # the minimum environmental flow (m3/s)
 
-    MFD = 0.63  # the minimum environmental flow (m3/s)
     use_sampling = True
 
     if use_sampling:

@@ -108,7 +108,7 @@ if __name__ == "__main__":
     }
     # Load the input data set
     streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
-    MFD = 0.63  # the minimum environmental flow (m3/s)
+    MFD = global_parameters["MFD"] # the minimum environmental flow (m3/s)
     
     # Set this variable to True if you want to sample the streamflow data, False otherwise
     use_sampling = True

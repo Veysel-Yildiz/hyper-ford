@@ -47,6 +47,7 @@ global_parameters = {
     "case_specific": {
         "hg": 117.3,
         "L": 208,
+        "MFD": 0.63,
         "cf": 0.15,
         "om": 0.01,
         "fxc": 5,

@@ -76,22 +76,46 @@ def opt_config(x, Q, global_parameters, turbine_characteristics):
     return Opt_energy(Q, typet, conf, X_in, global_parameters, turbine_characteristics)
 
 def main():
-    # Load the input data set
-    streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
-    MFD = 0.63  # the minimum environmental flow (m3/s)
+    
+    logging.info("Starting the single-objective optimization...")
 
-    # Define discharge after environmental flow
-    Q = np.maximum(streamflow - MFD, 0)
+    try:
+        with open('global_parameters.json', 'r') as json_file:
+            global_parameters = json.load(json_file)
+        logging.info("Loaded global parameters from JSON file.")
+    except FileNotFoundError as e:
+        logging.error(f"Error loading global_parameters.json: {e}")
+        return
+    except json.JSONDecodeError as e:
+        logging.error(f"Error decoding JSON file: {e}")
+        return
 
-    # Load the parameters from the JSON file
-    with open('global_parameters.json', 'r') as json_file:
-        global_parameters = json.load(json_file)
-
-    # Validate inputs
     parameter_constraints = get_parameter_constraints()
-    validate_parameters(global_parameters, parameter_constraints)
 
-    logging.info("All inputs are valid.")
+    try:
+        validate_parameters(global_parameters, parameter_constraints)
+        logging.info("Validated global parameters successfully.")
+    except ValueError as e:
+        logging.error(f"Parameter validation error: {e}")
+        return
+
+    try:
+        streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
+        logging.info("Loaded streamflow data from input file.")
+    except FileNotFoundError as e:
+        logging.error(f"Error loading streamflow data: {e}")
+        return
+
+    MFD = global_parameters["MFD"] # the minimum environmental flow (m3/s)
+    use_sampling = True
+
+    if use_sampling:
+        sample_size = 10
+        Sampled_streamflow = get_sampled_data(streamflow, sample_size)
+        Q = np.maximum(Sampled_streamflow - MFD, 0)
+    else:
+        Q = np.maximum(streamflow - MFD, 0)
+        
 
     # Define turbine characteristics and functions in a dictionary
     turbine_characteristics = {

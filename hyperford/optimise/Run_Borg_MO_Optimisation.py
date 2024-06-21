@@ -36,6 +36,7 @@ X(1), typet :  Turbine type (1= Kaplan, 2= Francis, 3 = Pelton turbine)
 # Import  the modules to be used from Library
 import numpy as np
 import json
+import subprocess
 import time
 
 
@@ -73,7 +74,10 @@ class MyMultiObjectiveProblem:
 
 if __name__ == "__main__":
     
-
+    # Make changes directly within the JSON file
+    # After making changes, reload the JSON file to get the updated parameters
+    subprocess.run(["python", "globalpars_JSON.py"])
+    
     # Load the parameters from the JSON file
     with open('global_parameters.json', 'r') as json_file:
         global_parameters = json.load(json_file)
@@ -95,8 +99,8 @@ if __name__ == "__main__":
     }
     # Load the input data set
     streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
-    MFD = 0.63  # the minimum environmental flow (m3/s)
     
+    MFD = global_parameters["MFD"] # the minimum environmental flow (m3/s)
     # Set this variable to True if you want to sample the streamflow data, False otherwise
     use_sampling = True
 
@@ -129,7 +133,7 @@ if __name__ == "__main__":
     
    # define and run the Borg algorithm for 10000 evaluations
     algorithm = BorgMOEA(problem, epsilons=0.001)
-    algorithm.run(2000)
+    algorithm.run(100)
 
     # End the timer
     end_time = time.time()

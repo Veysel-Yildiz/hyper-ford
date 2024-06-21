@@ -54,6 +54,7 @@ def get_parameter_constraints():
         "case_specific": {
             "hg": {"type": "float", "min": 0, "max": 1000, "unit": "meters"},
             "L": {"type": "float", "min": 0, "max": 10000, "unit": "meters"},
+            "MFD": {"type": "float", "min": 0, "max": 100, "unit": "m3/s"},
             "cf": {"type": "float", "min": 0.0, "max": 1.0, "unit": ""},
             "om": {"type": "float", "min": 0.0, "max": 0.5, "unit": ""},
             "fxc": {"type": "int", "min": 0, "max": 1000, "unit": "millions USD"},

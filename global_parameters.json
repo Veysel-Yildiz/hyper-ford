@@ -1,6 +1,7 @@
 {
     "operating_scheme": 1,
     "ObjectiveF": 1,
+    "MFD": 0.63,
     "case_specific": {
         "hg": 117.3,
         "L": 208,

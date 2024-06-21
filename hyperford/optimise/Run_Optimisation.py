@@ -72,10 +72,21 @@ def opt_config(x):
 
 if __name__ == "__main__":
     
+    # Load the parameters from the JSON file
+    with open('global_parameters.json', 'r') as json_file:
+        global_parameters = json.load(json_file)
+
+    # Get the parameter constraints
+    parameter_constraints = get_parameter_constraints()
+
+    # Validate inputs
+    validate_parameters(global_parameters, parameter_constraints)
+
+    print("All inputs are valid.")
     
     # Load the input data set
     streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
-    MFD = 0.63  # the minimum environmental flow (m3/s)
+    MFD = global_parameters["MFD"] # the minimum environmental flow (m3/s)
     
     
     # Set this variable to True if you want to sample the streamflow data, False otherwise
@@ -92,27 +103,6 @@ if __name__ == "__main__":
         Q = np.maximum(streamflow - MFD, 0)
         
   
-   
-if __name__ == "__main__":
-
-    # Load the input data set
-    streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
-    MFD = 0.63  # the minimum environmental flow (m3/s)
-
-    # Define discharge after environmental flow
-    Q = np.maximum(streamflow - MFD, 0)
-
-    # Load the parameters from the JSON file
-    with open('global_parameters.json', 'r') as json_file:
-        global_parameters = json.load(json_file)
-
-    # Get the parameter constraints
-    parameter_constraints = get_parameter_constraints()
-
-    # Validate inputs
-    validate_parameters(global_parameters, parameter_constraints)
-
-    print("All inputs are valid.")
 
 
     # Define turbine characteristics and functions in a dictionary
@@ -122,23 +112,7 @@ if __name__ == "__main__":
         1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
     }
 
-    # Load the input data set
-    streamflow = np.loadtxt('input/b_observed_long.txt', dtype=float, delimiter=',')
-    MFD = 0.63  # the minimum environmental flow (m3/s)
 
-    # Define discharge after environmental flow
-    Q = np.maximum(streamflow - MFD, 0)
-
-    # Load the parameters from the JSON file
-    with open('global_parameters.json', 'r') as json_file:
-        global_parameters = json.load(json_file)
-
-    # Define turbine characteristics and functions in a dictionary
-    turbine_characteristics = {
-        2: (global_parameters["mf"], global_parameters["nf"], global_parameters["eff_francis"]),# Francis turbine
-        3: (global_parameters["mp"], global_parameters["np"], global_parameters["eff_pelton"]),# Pelton turbine
-        1: (global_parameters["mk"], global_parameters["nk"], global_parameters["eff_kaplan"])# Kaplan turbine type
-    }
 
     # Set the number of turbines for optimization
     numturbine = 2  # Example: optimization up to two turbine configurations
