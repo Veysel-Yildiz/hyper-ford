@@ -18,6 +18,5 @@ dependencies = [
     "platypus-opt",
     "pymoo"
 ]
-
 [tool.setuptools.packages]
 find = { }
