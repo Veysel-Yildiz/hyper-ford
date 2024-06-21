@@ -9,13 +9,15 @@ authors = [{name = "Veysel Yildiz", email = "vyildiz1@sheffield.ac.uk"}]
 license = {text = "MIT License"}
 keywords = ["hydropower", "optimization", "simulation", "toolbox"]
 requires-python = ">=3.9"
-readme="README.md"
+readme = "README.md"
 dependencies = [
     "numpy",
     "scipy",
     "pandas",
     "matplotlib",
+    "platypus-opt",
     "pymoo"
-    ]
+]
+
 [tool.setuptools.packages]
 find = { }
