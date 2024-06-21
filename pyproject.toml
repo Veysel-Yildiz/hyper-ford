@@ -16,6 +16,6 @@ dependencies = [
     "pandas",
     "matplotlib",
     "pymoo"
-]
+    ]
 [tool.setuptools.packages]
 find = { }
