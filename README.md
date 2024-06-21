@@ -1,7 +1,7 @@
 
 # HYPER: HYdroPowER Simulation and Optimization Toolbox
 
-Welcome to the HYPER repository! This repository contains Python code for HYPER (HYdroPowER), a comprehensive tool designed to simulate and optimize the performance of run-of-river (RoR) hydropower plants. The toolbox is built exclusively using Python and introduced in the paper by V. Yildiz and J. Vrugt, "A toolbox for the optimal design of run-of-river hydropower plants" published in Environmental Modelling &amp; Software.
+Welcome to the HYPER repository! This repository hosts Python code for HYPER (HYdroPowER), an advanced tool crafted to simulate and optimize the performance of run-of-river (RoR) hydropower plants. Built entirely in Python, this toolbox represents an evolution of an earlier version introduced in the paper by V. Yildiz and J. Vrugt, titled "A toolbox for the optimal design of run-of-river hydropower plants," which was published in Environmental Modelling & Software.
 
 ## Overview 
 
@@ -77,5 +77,8 @@ If you are developing on the package you may wish to do an editable install: `py
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
-The development of this toolbox was introduced in the paper by V. Yildiz and J. Vrugt, "A toolbox for the optimal design of run-of-river hydropower plants," published in Environmental Modelling &amp; Software.
+The development of this toolbox was introduced in the following papers:
 
+V. Yildiz and J. Vrugt, "A toolbox for the optimal design of run-of-river hydropower plants," published in Environmental Modelling & Software.
+V. Yildiz, S. Brown, and C. Rouge, "Robust and Computationally Efficient Design for Run-of-River Hydropower," submitted to Environmental Modelling & Software.
+These papers laid the foundation for the methodologies and algorithms implemented in this HYPER toolbox.
