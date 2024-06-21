@@ -15,7 +15,7 @@ dependencies = [
     "scipy",
     "pandas",
     "matplotlib",
-    "platypus-opt,
+    "platypus-opt",
     "pymoo"
 ]
 
