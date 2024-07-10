@@ -57,8 +57,8 @@ To install the HYPER package:
    - Windows: `.venv\Scripts\activate`
    - macOS / Linux: `source .venv/bin/activate`
 4. Install the package:
-   - `py -m pip install .`
-   - For editable install: `py -m pip install -e .`
+   - `py pip install hyper-ford`
+  
 
 ## Usage
 
