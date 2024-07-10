@@ -3,7 +3,7 @@ requires = ["setuptools"]
 
 [project]
 name = "hyper-ford"
-version = "0.0.1"  # Update this version number for each new release
+version = "0.0.2"  # Update version number for each new release
 description = "HYdroPowER Simulation and Optimization Toolbox"
 authors = [{ name = "Veysel Yildiz", email = "vyildiz1@sheffield.ac.uk" }]
 license = { text = "MIT License" }
